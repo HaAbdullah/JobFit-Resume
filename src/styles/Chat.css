@@ -1,5 +1,6 @@
 .chat-container {
   width: 100%;
+  font-family: Verdana, sans-serif;
 }
 
 .message-input {
