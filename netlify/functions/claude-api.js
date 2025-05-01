@@ -1,11 +1,10 @@
-// netlify/functions/claude-api.js
 const axios = require("axios");
 
 exports.handler = async function (event, context) {
   // Set CORS headers
   const headers = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type, x-claude-api-key",
+    "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 
@@ -32,15 +31,14 @@ exports.handler = async function (event, context) {
     const body = JSON.parse(event.body);
     const messages = body.messages;
 
-    // Get API key from environment variable or request header
-    const apiKey =
-      process.env.CLAUDE_API_KEY || event.headers["x-claude-api-key"];
+    // Get API key from environment variable
+    const apiKey = process.env.CLAUDE_API_KEY;
 
     if (!apiKey) {
       return {
-        statusCode: 400,
+        statusCode: 500,
         headers,
-        body: JSON.stringify({ error: "API key is required" }),
+        body: JSON.stringify({ error: "API key not configured" }),
       };
     }
 
