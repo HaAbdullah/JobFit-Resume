@@ -8,7 +8,7 @@ function Main() {
 
   return (
     <div className="claude-chat-container">
-      <h1>Claude API Chat</h1>
+      <h1>Claude API Chat!</h1>
 
       <div className="conversation-container">
         {conversation.map((msg, index) => (
