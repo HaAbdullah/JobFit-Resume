@@ -1,0 +1,15 @@
+# netlify.toml - Configuration for Netlify deployment
+
+[build]
+  # Directory with the build output
+  publish = "dist"
+  # Build command
+  command = "npm run build"
+  # Directory where functions are located
+  functions = "netlify/functions"
+
+# Redirect and rewrite rules
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
