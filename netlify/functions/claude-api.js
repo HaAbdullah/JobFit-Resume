@@ -50,7 +50,7 @@ exports.handler = async function (event, context) {
         headers,
         body: JSON.stringify({
           status: "processing",
-          message: "Resume generation started",
+          message: "Summary generation started",
           sessionId: sessionId,
         }),
       };
@@ -78,7 +78,7 @@ exports.handler = async function (event, context) {
           headers,
           body: JSON.stringify({
             status: "processing",
-            message: "Resume generation in progress",
+            message: "Summary generation in progress",
             sessionId: sessionId,
           }),
         };
@@ -117,7 +117,7 @@ async function initiateApiCall(requestBody, sessionId) {
     // Prepare request payload with system message
     const requestPayload = {
       model: "claude-3-7-sonnet-20250219",
-      max_tokens: 4096,
+      max_tokens: 1024, // Reduced token limit for simple summaries
       messages: messages,
     };
 
@@ -136,11 +136,11 @@ async function initiateApiCall(requestBody, sessionId) {
           "Content-Type": "application/json",
           "anthropic-version": "2023-06-01",
         },
-        timeout: 60000, // 60 second timeout
+        timeout: 30000, // 30 second timeout
       }
     );
 
-    // Save result to storage system (in this case we'll use environment variables as a simple storage)
+    // Save result to storage system
     await saveResult(sessionId, response.data);
   } catch (error) {
     console.error("Error in API call:", error.message);

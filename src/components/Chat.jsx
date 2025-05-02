@@ -6,9 +6,8 @@ function Chat({ conversation, setConversation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [jobType, setJobType] = useState("US"); // Default to US
-  const [generatedResume, setGeneratedResume] = useState("");
-  const resumeRef = useRef(null);
+  const [generatedSummary, setGeneratedSummary] = useState("");
+  const summaryRef = useRef(null);
 
   // Send message functionality
   const handleSendMessage = async () => {
@@ -24,11 +23,10 @@ function Chat({ conversation, setConversation }) {
     setMessage("");
     setIsLoading(true);
     setError("");
-    setGeneratedResume("");
+    setGeneratedSummary("");
 
     try {
-      // Pass job type to API call
-      const response = await sendMessageToClaude(updatedConversation, jobType);
+      const response = await sendMessageToClaude(updatedConversation);
       const responseContent = response.content[0].text;
 
       // Add Claude's response to conversation
@@ -40,9 +38,9 @@ function Chat({ conversation, setConversation }) {
       // Extract HTML content if it exists
       const htmlMatch = responseContent.match(/```html\n([\s\S]*?)\n```/);
       if (htmlMatch && htmlMatch[1]) {
-        setGeneratedResume(htmlMatch[1]);
+        setGeneratedSummary(htmlMatch[1]);
       } else {
-        setGeneratedResume(responseContent);
+        setGeneratedSummary(responseContent);
       }
     } catch (err) {
       setError(err.message);
@@ -51,9 +49,9 @@ function Chat({ conversation, setConversation }) {
     }
   };
 
-  // Function to download resume as HTML
-  const downloadResume = () => {
-    if (!generatedResume) return;
+  // Function to download summary as HTML
+  const downloadHTML = () => {
+    if (!generatedSummary) return;
 
     // Create full HTML document with proper styling
     const fullHtml = `
@@ -62,46 +60,40 @@ function Chat({ conversation, setConversation }) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bilal Hasanjee - Resume</title>
+        <title>Job Summary</title>
         <style>
           body {
             font-family: Arial, sans-serif;
-            line-height: 1.2;
+            line-height: 1.5;
             margin: 0;
-            padding: 20px;
+            padding: 40px;
           }
-          .resume-container {
-            max-width: 8.5in;
+          .summary-container {
+            max-width: 800px;
             margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
           }
-          h1, h2, h3, h4 {
-            margin-top: 10px;
-            margin-bottom: 5px;
+          h1 {
+            color: #333;
+            margin-top: 0;
           }
           p {
-            margin: 0 0 8px;
+            margin: 15px 0;
           }
-          ul {
-            margin: 5px 0;
-            padding-left: 20px;
-          }
-          li {
-            margin-bottom: 3px;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 15px;
-          }
-          .section {
-            margin-bottom: 10px;
+          .summary-content {
+            font-size: 16px;
           }
           @media print {
             body {
-              margin: 0;
               padding: 0;
             }
-            .page-break {
-              page-break-after: always;
+            .summary-container {
+              border: none;
+              box-shadow: none;
+              padding: 10px;
             }
             .no-print {
               display: none;
@@ -110,8 +102,11 @@ function Chat({ conversation, setConversation }) {
         </style>
       </head>
       <body>
-        <div class="resume-container">
-          ${generatedResume}
+        <div class="summary-container">
+          <h1>Job Description Summary</h1>
+          <div class="summary-content">
+            ${generatedSummary}
+          </div>
         </div>
       </body>
       </html>
@@ -122,39 +117,26 @@ function Chat({ conversation, setConversation }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "Bilal_Hasanjee_Resume.html";
+    a.download = "Job_Summary.html";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  // Function to download resume as PDF
+  // Function to download summary as PDF
   const printToPDF = () => {
-    if (!generatedResume) return;
+    if (!generatedSummary) return;
     window.print();
   };
 
   return (
     <div className="chat-container">
-      <h1>Bilal Hasanjee Resume Generator</h1>
+      <h1>Job Description Summarizer</h1>
       <p className="instructions">
-        Paste a job description below and select your target location to
-        generate a customized resume tailored to the position.
+        Paste a job description below to generate a concise 3-line summary of
+        the position.
       </p>
-
-      <div className="job-type-selector">
-        <label>Job Location: </label>
-        <select
-          value={jobType}
-          onChange={(e) => setJobType(e.target.value)}
-          disabled={isLoading}
-        >
-          <option value="US">United States</option>
-          <option value="Canada">Canada</option>
-          <option value="Middle East">Middle East</option>
-        </select>
-      </div>
 
       <div className="message-input">
         <textarea
@@ -169,27 +151,26 @@ function Chat({ conversation, setConversation }) {
           disabled={!message.trim() || isLoading}
           className="generate-button"
         >
-          {isLoading ? "Generating..." : "Generate Resume"}
+          {isLoading ? "Summarizing..." : "Generate Summary"}
         </button>
       </div>
 
       {isLoading && (
         <div className="loading">
           <div className="spinner"></div>
-          <p>Generating your customized resume...</p>
+          <p>Generating your job summary...</p>
           <p className="loading-subtext">
-            This may take up to 60 seconds. Please be patient as we tailor your
-            resume to the job description.
+            This may take a few seconds. Please be patient.
           </p>
         </div>
       )}
 
       {error && <div className="error-message">Error: {error}</div>}
 
-      {generatedResume && (
-        <div className="resume-section">
-          <div className="resume-actions">
-            <button onClick={downloadResume} className="download-button">
+      {generatedSummary && (
+        <div className="summary-section">
+          <div className="summary-actions">
+            <button onClick={downloadHTML} className="download-button">
               Download as HTML
             </button>
             <button onClick={printToPDF} className="download-button">
@@ -197,12 +178,12 @@ function Chat({ conversation, setConversation }) {
             </button>
           </div>
 
-          <div className="resume-preview">
-            <h3>Resume Preview</h3>
+          <div className="summary-preview">
+            <h3>Summary Preview</h3>
             <div
-              ref={resumeRef}
-              className="resume-content"
-              dangerouslySetInnerHTML={{ __html: generatedResume }}
+              ref={summaryRef}
+              className="summary-content"
+              dangerouslySetInnerHTML={{ __html: generatedSummary }}
             />
           </div>
         </div>
