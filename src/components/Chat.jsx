@@ -25,13 +25,16 @@ function Chat({ conversation, setConversation }) {
     setIsLoading(true);
     setError("");
     setResumeContent(""); // Clear previous resume
-    
+
     // Show a timeout warning for longer requests
     let timeoutWarning = null;
     if (message.length > 100) {
       timeoutWarning = setTimeout(() => {
-        setError("This request is taking longer than expected. Please be patient as we generate your resume...");
+        setError(
+          "This request is taking longer than expected. Please be patient as we generate your resume..."
+        );
       }, 8000);
+    }
 
     try {
       // Pass job type to API call
@@ -58,11 +61,14 @@ function Chat({ conversation, setConversation }) {
   // Function to download resume as text file
   const downloadResume = () => {
     if (!resumeContent) return;
-    
+
     const element = document.createElement("a");
-    const file = new Blob([resumeContent], { type: 'text/plain' });
+    const file = new Blob([resumeContent], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = `Bilal_Hasanjee_Resume_${jobType.replace(/\s+/g, '_')}.txt`;
+    element.download = `Bilal_Hasanjee_Resume_${jobType.replace(
+      /\s+/g,
+      "_"
+    )}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -71,9 +77,9 @@ function Chat({ conversation, setConversation }) {
   // Function to download as PDF (requires HTML content)
   const generatePDF = () => {
     if (!resumeContent || !resumeRef.current) return;
-    
-    const printWindow = window.open('', '_blank');
-    
+
+    const printWindow = window.open("", "_blank");
+
     if (printWindow) {
       printWindow.document.write(`
         <!DOCTYPE html>
@@ -134,7 +140,7 @@ function Chat({ conversation, setConversation }) {
   return (
     <div className="chat-container">
       <h1>Resume Generator for Bilal Hasanjee</h1>
-      
+
       <div className="job-type-selector">
         <label>Job Location: </label>
         <select
@@ -172,16 +178,27 @@ function Chat({ conversation, setConversation }) {
           <div>Generating your customized resume...</div>
         </div>
       )}
-      
+
       {error && <div className="error-message">Error: {error}</div>}
-      
+
       {resumeContent && (
         <div className="resume-section">
           <h2>Generated Resume</h2>
-          <div className="resume-preview" ref={resumeRef} dangerouslySetInnerHTML={{ __html: resumeContent }}></div>
+          <div
+            className="resume-preview"
+            ref={resumeRef}
+            dangerouslySetInnerHTML={{ __html: resumeContent }}
+          ></div>
           <div className="download-options">
-            <button onClick={downloadResume} className="download-button">Download as Text</button>
-            <button onClick={generatePDF} className="download-button pdf-button">Download as PDF</button>
+            <button onClick={downloadResume} className="download-button">
+              Download as Text
+            </button>
+            <button
+              onClick={generatePDF}
+              className="download-button pdf-button"
+            >
+              Download as PDF
+            </button>
           </div>
         </div>
       )}
