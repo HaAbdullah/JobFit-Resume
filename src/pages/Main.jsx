@@ -8,17 +8,11 @@ function Main() {
 
   return (
     <div className="claude-chat-container">
-      <h1>Claude API Chat!</h1>
-
-      <div className="conversation-container">
-        {conversation.map((msg, index) => (
-          <div key={index} className={`message ${msg.role}`}>
-            <strong>{msg.role === "user" ? "You" : "Claude"}:</strong>
-            <p>{msg.content}</p>
-          </div>
-        ))}
-      </div>
-
+      <h1>Resume Bullet Point Generator</h1>
+      <p className="instructions">
+        Enter your Resume and Paste a job description below to generate a
+        concise 3-line summary.
+      </p>
       <Chat conversation={conversation} setConversation={setConversation} />
     </div>
   );

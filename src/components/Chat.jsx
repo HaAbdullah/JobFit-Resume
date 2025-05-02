@@ -1,190 +1,186 @@
-import React, { useState, useRef } from "react";
-import { sendMessageToClaude } from "../utils/claudeAPI.js";
+import React, { useState, useEffect } from "react";
+import { sendJobDescriptionToClaude } from "../utils/claudeAPI.js";
 import "../styles/Chat.css";
 
-function Chat({ conversation, setConversation }) {
+import { jsPDF } from "jspdf";
+
+function Chat() {
+  // Step 1: User has submitted a resume
+  const [isResumeSubmitted, setIsResumeSubmitted] = useState(false);
+  const [resume, setResume] = useState("");
+  // Step 2: User has submitted a job description
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [jobDescriptionInput, setjobDescriptionInput] = useState("");
+  const [finalClaudePrompt, setfinalClaudePrompt] = useState("");
   const [error, setError] = useState("");
-  const [generatedSummary, setGeneratedSummary] = useState("");
-  const summaryRef = useRef(null);
+  const [summary, setSummary] = useState("");
+  useEffect(() => {
+    // Check if html2pdf is already loaded
+    if (typeof window.html2pdf === "undefined") {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+      script.async = true;
+      script.onload = () => console.log("html2pdf loaded successfully");
+      script.onerror = () => console.error("Failed to load html2pdf library");
+      document.body.appendChild(script);
+    }
+  }, []);
+  const handleSendResume = async () => {
+    if (!resume.trim()) return;
+    setIsResumeSubmitted(true);
+  };
 
-  // Send message functionality
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
-
-    // Add user message to conversation
-    const updatedConversation = [
-      ...conversation,
-      { role: "user", content: message },
-    ];
-
-    setConversation(updatedConversation);
-    setMessage("");
+  const handleSendJobDescription = async () => {
+    if (!jobDescriptionInput.trim()) return;
     setIsLoading(true);
     setError("");
-    setGeneratedSummary("");
+    setSummary("");
+
+    // Create the prompt
+    let createdPrompt =
+      "RESUME\n" + resume + "\nJOB DESCRIPTION\n" + jobDescriptionInput;
+    setfinalClaudePrompt(createdPrompt);
 
     try {
-      const response = await sendMessageToClaude(updatedConversation);
-      const responseContent = response.content[0].text;
-
-      // Add Claude's response to conversation
-      setConversation([
-        ...updatedConversation,
-        { role: "assistant", content: responseContent },
-      ]);
-
-      // Extract HTML content if it exists
-      const htmlMatch = responseContent.match(/```html\n([\s\S]*?)\n```/);
-      if (htmlMatch && htmlMatch[1]) {
-        setGeneratedSummary(htmlMatch[1]);
-      } else {
-        setGeneratedSummary(responseContent);
-      }
+      // Use the createdPrompt directly instead of finalClaudePrompt state
+      const response = await sendJobDescriptionToClaude(createdPrompt);
+      setSummary(response.content[0].text);
     } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
+  // Function to download as HTML or PDF
+  const downloadPDF = (format = "html") => {
+    if (!summary) return;
 
-  // Function to download summary as HTML
-  const downloadHTML = () => {
-    if (!generatedSummary) return;
+    // Create HTML document with the summary
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Job Summary</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
+  h1 { text-align: center; margin-bottom: 30px; }
+  .summary { font-size: 16px; white-space: pre-line; }
+</style>
+</head>
+<body>
+<h1>Job Description Summary</h1>
+<div class="summary">${summary}</div>
+</body>
+</html>`;
 
-    // Create full HTML document with proper styling
-    const fullHtml = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Job Summary</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            line-height: 1.5;
-            margin: 0;
-            padding: 40px;
-          }
-          .summary-container {
-            max-width: 800px;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          }
-          h1 {
-            color: #333;
-            margin-top: 0;
-          }
-          p {
-            margin: 15px 0;
-          }
-          .summary-content {
-            font-size: 16px;
-          }
-          @media print {
-            body {
-              padding: 0;
-            }
-            .summary-container {
-              border: none;
-              box-shadow: none;
-              padding: 10px;
-            }
-            .no-print {
-              display: none;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="summary-container">
-          <h1>Job Description Summary</h1>
-          <div class="summary-content">
-            ${generatedSummary}
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    if (format === "html") {
+      // Create blob and download link for HTML
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "job_summary.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else if (format === "pdf") {
+      try {
+        // Create a PDF directly using jsPDF
+        const doc = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
 
-    // Create blob and download link
-    const blob = new Blob([fullHtml], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "Job_Summary.html";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+        // Parse the summary to remove any HTML tags
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = summary;
+        const cleanText = tempDiv.textContent || tempDiv.innerText || summary;
 
-  // Function to download summary as PDF
-  const printToPDF = () => {
-    if (!generatedSummary) return;
-    window.print();
+        // Set font size and add title
+        doc.setFontSize(18);
+        doc.text("Job Description Summary", 105, 20, { align: "center" });
+
+        // Set font size for content
+        doc.setFontSize(12);
+
+        // Split text into lines that fit the page width
+        const splitText = doc.splitTextToSize(cleanText, 170);
+        doc.text(splitText, 20, 40);
+
+        // Save the PDF
+        doc.save("job_summary.pdf");
+      } catch (err) {
+        console.error("Error in PDF generation:", err);
+        alert("An error occurred while generating the PDF. Please try again.");
+      }
+    }
   };
 
   return (
     <div className="chat-container">
-      <h1>Job Description Summarizer</h1>
-      <p className="instructions">
-        Paste a job description below to generate a concise 3-line summary of
-        the position.
-      </p>
-
       <div className="message-input">
         <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Paste job description here..."
-          disabled={isLoading}
+          value={resume}
+          onChange={(e) => setResume(e.target.value)}
+          placeholder="Paste resume here..."
           rows={8}
         />
         <button
-          onClick={handleSendMessage}
-          disabled={!message.trim() || isLoading}
+          onClick={handleSendResume}
+          disabled={!resume.trim()}
           className="generate-button"
         >
-          {isLoading ? "Summarizing..." : "Generate Summary"}
+          Submit Resume
         </button>
       </div>
+      {isResumeSubmitted && (
+        <div className="message-input">
+          <textarea
+            value={jobDescriptionInput}
+            onChange={(e) => setjobDescriptionInput(e.target.value)}
+            placeholder="Paste job description here..."
+            disabled={isLoading}
+            rows={8}
+          />
+          <button
+            onClick={handleSendJobDescription}
+            disabled={!jobDescriptionInput.trim() || isLoading}
+            className="generate-button"
+          >
+            {isLoading ? "Generating..." : "Generate Summary"}
+          </button>
+        </div>
+      )}
 
       {isLoading && (
         <div className="loading">
           <div className="spinner"></div>
-          <p>Generating your job summary...</p>
-          <p className="loading-subtext">
-            This may take a few seconds. Please be patient.
-          </p>
+          <p>Generating summary...</p>
         </div>
       )}
 
       {error && <div className="error-message">Error: {error}</div>}
 
-      {generatedSummary && (
+      {summary && (
         <div className="summary-section">
-          <div className="summary-actions">
-            <button onClick={downloadHTML} className="download-button">
+          <h3>Summary Preview</h3>
+          <div className="summary-content">{summary}</div>
+          <div className="download-buttons">
+            <button
+              onClick={() => downloadPDF("html")}
+              className="download-button"
+            >
               Download as HTML
             </button>
-            <button onClick={printToPDF} className="download-button">
-              Save as PDF
+            <button
+              onClick={() => downloadPDF("pdf")}
+              className="download-button"
+            >
+              Download as PDF
             </button>
-          </div>
-
-          <div className="summary-preview">
-            <h3>Summary Preview</h3>
-            <div
-              ref={summaryRef}
-              className="summary-content"
-              dangerouslySetInnerHTML={{ __html: generatedSummary }}
-            />
           </div>
         </div>
       )}
