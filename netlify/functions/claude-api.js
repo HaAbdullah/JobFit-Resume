@@ -30,6 +30,7 @@ exports.handler = async function (event, context) {
     // Parse the request body
     const body = JSON.parse(event.body);
     const messages = body.messages;
+    const system = body.system; // Get system message
 
     // Get API key from environment variable
     const apiKey = process.env.CLAUDE_API_KEY;
@@ -47,6 +48,7 @@ exports.handler = async function (event, context) {
       "https://api.anthropic.com/v1/messages",
       {
         model: "claude-3-7-sonnet-20250219",
+        system: system, // Use the system message
         messages: messages,
         max_tokens: 4096, // Increased token limit for resume generation
       },

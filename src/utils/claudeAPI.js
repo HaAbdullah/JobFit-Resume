@@ -53,11 +53,19 @@ ${
 - Focus on leadership capabilities, technical expertise, and stakeholder management
 
 ### IMPLEMENTATION APPROACH
-1. Use provided HTML template formatting exactly 
+1. Return the resume as properly formatted HTML for display on the website
 2. PRE-ANALYZE content length before generation
 3. MONITOR space usage continuously during creation
-4. Include print optimization CSS
-5. VERIFY page breaks are properly controlled`;
+4. Include print optimization for PDF download
+5. Make the resume visually appealing with appropriate formatting
+
+### RESPONSE FORMAT
+- Return the resume as properly formatted HTML using only these tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <strong>, <em>, <br>, <hr>, <div>
+- Use <h1> for the name, <h2> for main sections, <h3> for subsections
+- Use <strong> for company names and job titles
+- Use <ul> and <li> for bullet points
+- Include appropriate CSS styles inline for printing
+- Do not include any explanations before or after the HTML content`;
 
   try {
     // Filter out any invalid roles (like a system message from previous bugged states)
@@ -68,6 +76,7 @@ ${
     const body = {
       system: resumeInstructions, // ✅ Use top-level `system`
       messages: filteredMessages, // ✅ Only allowed roles
+      jobType: jobType, // Pass job type to API
     };
 
     const response = await fetch("/api/claude-api", {
