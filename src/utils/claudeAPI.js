@@ -60,17 +60,20 @@ ${
 5. VERIFY page breaks are properly controlled`;
 
   try {
-    // Add system instructions to every API call
-    const messagesWithInstructions = [
-      { role: "system", content: resumeInstructions },
-      ...messages,
-    ];
+    // Filter out any invalid roles (like a system message from previous bugged states)
+    const filteredMessages = messages.filter(
+      (msg) => msg.role === "user" || msg.role === "assistant"
+    );
 
-    // Use relative URL that will be rewritten to Netlify function
+    const body = {
+      system: resumeInstructions, // ✅ Use top-level `system`
+      messages: filteredMessages, // ✅ Only allowed roles
+    };
+
     const response = await fetch("/api/claude-api", {
       method: "POST",
       headers: headers,
-      body: JSON.stringify({ messages: messagesWithInstructions }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
