@@ -177,7 +177,10 @@ function Chat({ conversation, setConversation }) {
         <div className="loading">
           <div className="spinner"></div>
           <p>Generating your customized resume...</p>
-          <p className="loading-subtext">This may take up to 30 seconds</p>
+          <p className="loading-subtext">
+            This may take up to 60 seconds. Please be patient as we tailor your
+            resume to the job description.
+          </p>
         </div>
       )}
 

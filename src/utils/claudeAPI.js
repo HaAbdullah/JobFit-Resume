@@ -101,26 +101,82 @@ ${locationFormatting}
       }
     }
 
-    const body = {
-      system: resumeInstructions, // ✅ Use top-level system
-      messages: filteredMessages, // ✅ Only allowed roles
-    };
+    // Create a session ID for this request
+    const sessionId = Date.now().toString();
 
-    const response = await fetch("/api/claude-api", {
+    // Initial API call to start the generation process
+    const startResponse = await fetch("/api/claude-api", {
       method: "POST",
       headers: headers,
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        action: "start",
+        sessionId: sessionId,
+        system: resumeInstructions,
+        messages: filteredMessages,
+      }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
+    if (!startResponse.ok) {
+      const errorData = await startResponse.json();
       throw new Error(
-        `API request failed: ${response.status} - ${JSON.stringify(errorData)}`
+        `API request failed: ${startResponse.status} - ${JSON.stringify(
+          errorData
+        )}`
       );
     }
 
-    const data = await response.json();
-    return data;
+    // Start polling for results
+    let resultData = null;
+    let attempts = 0;
+    const maxAttempts = 30; // Max 30 attempts (30 seconds with 1-second interval)
+
+    while (attempts < maxAttempts) {
+      attempts++;
+
+      // Wait 1 second between polling attempts
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Poll for results
+      const pollResponse = await fetch("/api/claude-api", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({
+          action: "poll",
+          sessionId: sessionId,
+        }),
+      });
+
+      if (!pollResponse.ok) {
+        // If there's an error, continue polling
+        console.warn(
+          `Polling attempt ${attempts} failed:`,
+          await pollResponse.text()
+        );
+        continue;
+      }
+
+      const pollData = await pollResponse.json();
+
+      // If processing is complete, we have our result
+      if (pollData.status === "completed") {
+        resultData = pollData;
+        break;
+      }
+
+      // If there was an error, throw it
+      if (pollData.status === "error") {
+        throw new Error(`API processing error: ${pollData.error}`);
+      }
+
+      // Otherwise (status still "processing"), continue polling
+    }
+
+    // If we've exceeded max attempts, throw an error
+    if (!resultData) {
+      throw new Error("Resume generation timed out after 30 seconds");
+    }
+
+    return resultData;
   } catch (error) {
     console.error("Error calling Claude API:", error);
     throw error;
