@@ -7,7 +7,7 @@ function Chat({ conversation, setConversation }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [jobType, setJobType] = useState("US"); // Default to US
-  const [resumeContent, setResumeContent] = useState("");
+  const [generatedResume, setGeneratedResume] = useState("");
   const resumeRef = useRef(null);
 
   // Send message functionality
@@ -24,17 +24,7 @@ function Chat({ conversation, setConversation }) {
     setMessage("");
     setIsLoading(true);
     setError("");
-    setResumeContent(""); // Clear previous resume
-
-    // Show a timeout warning for longer requests
-    let timeoutWarning = null;
-    if (message.length > 100) {
-      timeoutWarning = setTimeout(() => {
-        setError(
-          "This request is taking longer than expected. Please be patient as we generate your resume..."
-        );
-      }, 8000);
-    }
+    setGeneratedResume("");
 
     try {
       // Pass job type to API call
@@ -47,99 +37,111 @@ function Chat({ conversation, setConversation }) {
         { role: "assistant", content: responseContent },
       ]);
 
-      // Set resume content for download
-      setResumeContent(responseContent);
+      // Extract HTML content if it exists
+      const htmlMatch = responseContent.match(/```html\n([\s\S]*?)\n```/);
+      if (htmlMatch && htmlMatch[1]) {
+        setGeneratedResume(htmlMatch[1]);
+      } else {
+        setGeneratedResume(responseContent);
+      }
     } catch (err) {
-      console.error("Error in handleSendMessage:", err);
-      setError(err.message || "Failed to generate resume. Please try again.");
+      setError(err.message);
     } finally {
       setIsLoading(false);
-      if (timeoutWarning) clearTimeout(timeoutWarning);
     }
   };
 
-  // Function to download resume as text file
+  // Function to download resume as HTML
   const downloadResume = () => {
-    if (!resumeContent) return;
+    if (!generatedResume) return;
 
-    const element = document.createElement("a");
-    const file = new Blob([resumeContent], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = `Bilal_Hasanjee_Resume_${jobType.replace(
-      /\s+/g,
-      "_"
-    )}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    // Create full HTML document with proper styling
+    const fullHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bilal Hasanjee - Resume</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.2;
+            margin: 0;
+            padding: 20px;
+          }
+          .resume-container {
+            max-width: 8.5in;
+            margin: 0 auto;
+          }
+          h1, h2, h3, h4 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+          }
+          p {
+            margin: 0 0 8px;
+          }
+          ul {
+            margin: 5px 0;
+            padding-left: 20px;
+          }
+          li {
+            margin-bottom: 3px;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 15px;
+          }
+          .section {
+            margin-bottom: 10px;
+          }
+          @media print {
+            body {
+              margin: 0;
+              padding: 0;
+            }
+            .page-break {
+              page-break-after: always;
+            }
+            .no-print {
+              display: none;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="resume-container">
+          ${generatedResume}
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Create blob and download link
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Bilal_Hasanjee_Resume.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
-  // Function to download as PDF (requires HTML content)
-  const generatePDF = () => {
-    if (!resumeContent || !resumeRef.current) return;
-
-    const printWindow = window.open("", "_blank");
-
-    if (printWindow) {
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Bilal Hasanjee Resume</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.2;
-              margin: 0.5in;
-              font-size: 10pt;
-            }
-            h1, h2, h3 {
-              margin-top: 10px;
-              margin-bottom: 5px;
-            }
-            p {
-              margin: 2px 0;
-            }
-            ul {
-              margin: 2px 0;
-              padding-left: 20px;
-            }
-            li {
-              margin-bottom: 2px;
-            }
-            @media print {
-              @page {
-                size: letter;
-                margin: 0.5in;
-              }
-              body {
-                -webkit-print-color-adjust: exact;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div id="resume-content">
-            ${resumeRef.current.innerHTML}
-          </div>
-          <script>
-            window.onload = function() {
-              window.print();
-              window.setTimeout(function() {
-                window.close();
-              }, 100);
-            };
-          </script>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
+  // Function to download resume as PDF
+  const printToPDF = () => {
+    if (!generatedResume) return;
+    window.print();
   };
 
   return (
     <div className="chat-container">
-      <h1>Resume Generator for Bilal Hasanjee</h1>
+      <h1>Bilal Hasanjee Resume Generator</h1>
+      <p className="instructions">
+        Paste a job description below and select your target location to
+        generate a customized resume tailored to the position.
+      </p>
 
       <div className="job-type-selector">
         <label>Job Location: </label>
@@ -158,47 +160,47 @@ function Chat({ conversation, setConversation }) {
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Paste job description here or ask for resume customization..."
+          placeholder="Paste job description here..."
           disabled={isLoading}
-          rows={6}
-          className="description-input"
+          rows={8}
         />
         <button
           onClick={handleSendMessage}
           disabled={!message.trim() || isLoading}
           className="generate-button"
         >
-          Generate Resume
+          {isLoading ? "Generating..." : "Generate Resume"}
         </button>
       </div>
 
       {isLoading && (
         <div className="loading">
-          <div className="loading-spinner"></div>
-          <div>Generating your customized resume...</div>
+          <div className="spinner"></div>
+          <p>Generating your customized resume...</p>
+          <p className="loading-subtext">This may take up to 30 seconds</p>
         </div>
       )}
 
       {error && <div className="error-message">Error: {error}</div>}
 
-      {resumeContent && (
+      {generatedResume && (
         <div className="resume-section">
-          <h2>Generated Resume</h2>
-          <div
-            className="resume-preview"
-            ref={resumeRef}
-            dangerouslySetInnerHTML={{ __html: resumeContent }}
-          ></div>
-          <div className="download-options">
+          <div className="resume-actions">
             <button onClick={downloadResume} className="download-button">
-              Download as Text
+              Download as HTML
             </button>
-            <button
-              onClick={generatePDF}
-              className="download-button pdf-button"
-            >
-              Download as PDF
+            <button onClick={printToPDF} className="download-button">
+              Save as PDF
             </button>
+          </div>
+
+          <div className="resume-preview">
+            <h3>Resume Preview</h3>
+            <div
+              ref={resumeRef}
+              className="resume-content"
+              dangerouslySetInnerHTML={{ __html: generatedResume }}
+            />
           </div>
         </div>
       )}

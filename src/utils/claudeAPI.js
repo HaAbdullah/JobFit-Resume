@@ -9,16 +9,37 @@ export const sendMessageToClaude = async (messages, jobType = "US") => {
     "Content-Type": "application/json",
   };
 
-  // Simplified instructions for testing if just saying "hi"
-  const isTestMessage =
-    messages.length === 1 &&
-    messages[0].role === "user" &&
-    messages[0].content.trim().toLowerCase() === "hi";
+  // Create location-specific formatting instructions based on job type
+  let locationFormatting = "";
+
+  if (jobType === "US") {
+    locationFormatting =
+      "- FORMAT contact information as:\n" +
+      "  Email: bilal.hasanjee1@gmail.com\n" +
+      "  Cell: +1-647-687-7567\n" +
+      "        +1-646-408-2127; New York\n" +
+      '- KEEP "Authorized to work in the U.S." text\n' +
+      "- INCLUDE both Toronto and New York in current position location";
+  } else if (jobType === "Canada") {
+    locationFormatting =
+      "- FORMAT contact information as:\n" +
+      "  Email: bilal.hasanjee1@gmail.com\n" +
+      "  Cell: +1-647-687-7567; Toronto\n" +
+      '- REMOVE "Authorized to work in the U.S." text\n' +
+      "- UPDATE current position to Toronto only";
+  } else {
+    locationFormatting =
+      "- FORMAT contact information as:\n" +
+      "  Email: bilal.hasanjee1@gmail.com\n" +
+      "  Cell: +1-647-687-7567; " +
+      jobType +
+      "\n" +
+      '- CHANGE "(Authorized to work in the U.S.)" to "(Canadian Citizen with GCC and US/UK Experience)"\n' +
+      "- You can go beyond 2 pages and add CIBC experience and expand Middle East experiences";
+  }
 
   // Resume building system instructions
-  const resumeInstructions = isTestMessage
-    ? "Respond with a simple hello message."
-    : `# Comprehensive Resume Generation Instructions
+  const resumeInstructions = `# Comprehensive Resume Generation Instructions
 You are a specialized resume generator for Bilal Hasanjee. Follow these strict formatting requirements:
 
 ### CRITICAL FORMATTING REQUIREMENTS
@@ -31,26 +52,7 @@ You are a specialized resume generator for Bilal Hasanjee. Follow these strict f
 
 ### HEADER FORMATTING
 - FORMAT name section with "Bilal Hasanjee, CFA®, MBA, MSc Finance" all on one line
-${
-  jobType === "US"
-    ? `- FORMAT contact information as:
-  Email: bilal.hasanjee1@gmail.com
-  Cell: +1-647-687-7567
-        +1-646-408-2127; New York
-- KEEP "Authorized to work in the U.S." text
-- INCLUDE both Toronto and New York in current position location`
-    : jobType === "Canada"
-    ? `- FORMAT contact information as:
-  Email: bilal.hasanjee1@gmail.com
-  Cell: +1-647-687-7567; Toronto
-- REMOVE "Authorized to work in the U.S." text
-- UPDATE current position to Toronto only`
-    : `- FORMAT contact information as:
-  Email: bilal.hasanjee1@gmail.com
-  Cell: +1-647-687-7567; ${jobType}
-- CHANGE "(Authorized to work in the U.S.)" to "(Canadian Citizen with GCC and US/UK Experience)"
-- You can go beyond 2 pages and add CIBC experience and expand Middle East experiences`
-}
+${locationFormatting}
 
 ### CONTENT OPTIMIZATION
 - Analyze job descriptions thoroughly before customization
@@ -60,20 +62,19 @@ ${
 - Use exact terminology from the job posting for ATS optimization
 - Focus on leadership capabilities, technical expertise, and stakeholder management
 
+### OUTPUT FORMAT
+- Provide the complete resume in valid HTML format
+- Wrap the HTML code in \`\`\`html code blocks
+- Include inline CSS for proper formatting
+- Ensure all styling follows the CRITICAL FORMATTING REQUIREMENTS
+- Make sure the HTML is properly formatted for direct display in a web browser
+
 ### IMPLEMENTATION APPROACH
-1. Return the resume as properly formatted HTML for display on the website
+1. Use clean HTML with proper semantic tags
 2. PRE-ANALYZE content length before generation
 3. MONITOR space usage continuously during creation
-4. Include print optimization for PDF download
-5. Make the resume visually appealing with appropriate formatting
-
-### RESPONSE FORMAT
-- Return the resume as properly formatted HTML using only these tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <strong>, <em>, <br>, <hr>, <div>
-- Use <h1> for the name, <h2> for main sections, <h3> for subsections
-- Use <strong> for company names and job titles
-- Use <ul> and <li> for bullet points
-- Include appropriate CSS styles inline for printing
-- Do not include any explanations before or after the HTML content`;
+4. Include print optimization CSS
+5. VERIFY page breaks are properly controlled`;
 
   try {
     // Filter out any invalid roles (like a system message from previous bugged states)
@@ -81,11 +82,28 @@ ${
       (msg) => msg.role === "user" || msg.role === "assistant"
     );
 
+    // Add special instruction to the last user message to request HTML output
+    if (filteredMessages.length > 0) {
+      const lastUserMsgIndex = filteredMessages.findLastIndex(
+        (msg) => msg.role === "user"
+      );
+      if (lastUserMsgIndex !== -1) {
+        const enhancedUserMessage =
+          filteredMessages[lastUserMsgIndex].content +
+          "\n\nPlease format the resume in clean HTML that I can directly display on a webpage. " +
+          "Wrap the HTML in ```html code blocks. Make sure all formatting is done through inline styles " +
+          "to ensure consistent display and printing.";
+
+        filteredMessages[lastUserMsgIndex] = {
+          ...filteredMessages[lastUserMsgIndex],
+          content: enhancedUserMessage,
+        };
+      }
+    }
+
     const body = {
-      system: resumeInstructions, // ✅ Use top-level `system`
+      system: resumeInstructions, // ✅ Use top-level system
       messages: filteredMessages, // ✅ Only allowed roles
-      jobType: jobType, // Pass job type to API
-      isTestMessage: isTestMessage, // Flag for test message
     };
 
     const response = await fetch("/api/claude-api", {
