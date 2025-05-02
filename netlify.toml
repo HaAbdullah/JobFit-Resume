@@ -7,7 +7,12 @@
   command = "npm run build"
   # Directory where functions are located
   functions = "netlify/functions"
-
+[
+functions
+]
+  # Increase the timeout for the functions to 30 seconds
+  node_bundler = "esbuild"
+  timeout = 30
 # Redirect and rewrite rules
 [[redirects]]
   from = "/api/*"

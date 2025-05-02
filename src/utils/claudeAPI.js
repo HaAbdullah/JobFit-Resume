@@ -9,8 +9,16 @@ export const sendMessageToClaude = async (messages, jobType = "US") => {
     "Content-Type": "application/json",
   };
 
+  // Simplified instructions for testing if just saying "hi"
+  const isTestMessage =
+    messages.length === 1 &&
+    messages[0].role === "user" &&
+    messages[0].content.trim().toLowerCase() === "hi";
+
   // Resume building system instructions
-  const resumeInstructions = `# Comprehensive Resume Generation Instructions
+  const resumeInstructions = isTestMessage
+    ? "Respond with a simple hello message."
+    : `# Comprehensive Resume Generation Instructions
 You are a specialized resume generator for Bilal Hasanjee. Follow these strict formatting requirements:
 
 ### CRITICAL FORMATTING REQUIREMENTS
@@ -77,6 +85,7 @@ ${
       system: resumeInstructions, // ✅ Use top-level `system`
       messages: filteredMessages, // ✅ Only allowed roles
       jobType: jobType, // Pass job type to API
+      isTestMessage: isTestMessage, // Flag for test message
     };
 
     const response = await fetch("/api/claude-api", {
