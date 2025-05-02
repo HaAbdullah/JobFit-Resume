@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { sendJobDescriptionToClaude } from "../utils/claudeAPI.js";
+import { processPDFResume } from "../utils/pdfExtractor";
 import "../styles/Chat.css";
 
 import { jsPDF } from "jspdf";
@@ -26,9 +27,55 @@ function Chat() {
       document.body.appendChild(script);
     }
   }, []);
+
+  // RESUME UPLOAD HANDLERS
+  const fileInputRef = useRef(null);
+
   const handleSendResume = async () => {
     if (!resume.trim()) return;
     setIsResumeSubmitted(true);
+    // Additional logic after submitting resume
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      setError("Please upload a PDF file");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const extractedText = await processPDFResume(file);
+      setResume(extractedText);
+
+      // Optional: Auto-submit if needed
+      // setIsResumeSubmitted(true);
+    } catch (error) {
+      console.error("Error processing resume:", error);
+      setError(
+        "Failed to extract text from the PDF. Please try again or paste your resume directly."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
+  const clearResumeData = () => {
+    setResume("");
+    setError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
   };
 
   const handleSendJobDescription = async () => {
@@ -121,21 +168,58 @@ function Chat() {
 
   return (
     <div className="chat-container">
-      <div className="message-input">
-        <textarea
-          value={resume}
-          onChange={(e) => setResume(e.target.value)}
-          placeholder="Paste resume here..."
-          rows={8}
-        />
-        <button
-          onClick={handleSendResume}
-          disabled={!resume.trim()}
-          className="generate-button"
-        >
-          Submit Resume
-        </button>
+      <h2>Upload or Paste Your Resume</h2>
+
+      <div className="upload-options">
+        <div className="upload-section">
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+            className="file-input"
+            style={{ display: "none" }}
+          />
+          <button
+            onClick={triggerFileInput}
+            className="upload-button"
+            disabled={isLoading}
+          >
+            {isLoading ? "Processing..." : "Upload PDF Resume"}
+          </button>
+          <p className="or-divider">- OR -</p>
+        </div>
+
+        <div className="message-input">
+          <textarea
+            value={resume}
+            onChange={(e) => setResume(e.target.value)}
+            placeholder="Paste resume here..."
+            rows={8}
+            disabled={isLoading}
+          />
+
+          {resume && (
+            <button
+              onClick={clearResumeData}
+              className="clear-button"
+              disabled={isLoading}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <button
+        onClick={handleSendResume}
+        disabled={!resume.trim() || isLoading}
+        className="generate-button"
+      >
+        Submit Resume
+      </button>
       {isResumeSubmitted && (
         <div className="message-input">
           <textarea
