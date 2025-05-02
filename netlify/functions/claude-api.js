@@ -42,13 +42,13 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // Call Claude API
+    // Call Claude API with increased max_tokens for resume generation
     const response = await axios.post(
       "https://api.anthropic.com/v1/messages",
       {
         model: "claude-3-7-sonnet-20250219",
         messages: messages,
-        max_tokens: 1000,
+        max_tokens: 4096, // Increased token limit for resume generation
       },
       {
         headers: {

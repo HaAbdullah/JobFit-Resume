@@ -6,6 +6,7 @@ function Chat({ conversation, setConversation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [jobType, setJobType] = useState("US"); // Default to US
 
   // Send message functionality
   const handleSendMessage = async () => {
@@ -23,7 +24,8 @@ function Chat({ conversation, setConversation }) {
     setError("");
 
     try {
-      const response = await sendMessageToClaude(updatedConversation);
+      // Pass job type to API call
+      const response = await sendMessageToClaude(updatedConversation, jobType);
 
       // Add Claude's response to conversation
       setConversation([
@@ -39,24 +41,38 @@ function Chat({ conversation, setConversation }) {
 
   return (
     <div className="chat-container">
+      <div className="job-type-selector">
+        <label>Job Location: </label>
+        <select
+          value={jobType}
+          onChange={(e) => setJobType(e.target.value)}
+          disabled={isLoading}
+        >
+          <option value="US">United States</option>
+          <option value="Canada">Canada</option>
+          <option value="Middle East">Middle East</option>
+        </select>
+      </div>
+
       <div className="message-input">
-        <input
-          type="text"
+        <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
+          placeholder="Paste job description here or ask for resume customization..."
           disabled={isLoading}
-          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+          rows={4}
         />
         <button
           onClick={handleSendMessage}
           disabled={!message.trim() || isLoading}
         >
-          Send
+          Generate Resume
         </button>
       </div>
 
-      {isLoading && <div className="loading">Claude is thinking...</div>}
+      {isLoading && (
+        <div className="loading">Generating your customized resume...</div>
+      )}
       {error && <div className="error-message">Error: {error}</div>}
     </div>
   );

@@ -51,3 +51,73 @@
   margin-top: 10px;
   font-size: 14px;
 }
+.chat-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.message-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.message-input textarea {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.message-input button {
+  padding: 12px 20px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.message-input button:hover {
+  background-color: #3367d6;
+}
+
+.message-input button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: #666;
+}
+
+.error-message {
+  padding: 15px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.job-type-selector {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.job-type-selector select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+}
