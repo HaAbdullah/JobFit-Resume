@@ -7,12 +7,13 @@ export const sendJobDescriptionToClaude = async (prompt) => {
   try {
     // For debugging
     console.log("Sending prompt to Claude API, length:", prompt.length);
+    const isLocalhost = window.location.hostname === "localhost";
 
-    // Replace with your actual Render service URL
-    const RENDER_API_URL =
-      "https://jobfit-backend-29ai.onrender.com/api/create-bullets";
+    const API_BASE_URL = isLocalhost
+      ? "http://localhost:3000/api"
+      : "https://jobfit-backend-29ai.onrender.com/api";
 
-    const response = await fetch(RENDER_API_URL, {
+    const response = await fetch(`${API_BASE_URL}/create-bullets`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

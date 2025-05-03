@@ -100,51 +100,37 @@ function Chat() {
     }
   };
   // Function to download as HTML or PDF
-  const downloadPDF = (format = "html") => {
+  const downloadPDF = () => {
     if (!summary) return;
+    try {
+      // mm I love a4
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-    if (format === "html") {
-      // Create blob and download link for HTML
-      const blob = new Blob([summary], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "job_summary.html";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } else if (format === "pdf") {
-      try {
-        // mm I love a4
-        const doc = new jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: "a4",
-        });
+      // Parse
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = summary;
+      const cleanText = tempDiv.textContent || tempDiv.innerText || summary;
 
-        // Parse
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = summary;
-        const cleanText = tempDiv.textContent || tempDiv.innerText || summary;
+      // Set font size and add title
+      doc.setFontSize(18);
+      doc.text("Job Description Summary", 105, 20, { align: "center" });
 
-        // Set font size and add title
-        doc.setFontSize(18);
-        doc.text("Job Description Summary", 105, 20, { align: "center" });
+      // Set font size for content
+      doc.setFontSize(12);
 
-        // Set font size for content
-        doc.setFontSize(12);
+      // Split text into lines that fit the page width
+      const splitText = doc.splitTextToSize(cleanText, 170);
+      doc.text(splitText, 20, 40);
 
-        // Split text into lines that fit the page width
-        const splitText = doc.splitTextToSize(cleanText, 170);
-        doc.text(splitText, 20, 40);
-
-        // Save the PDF
-        doc.save("job_summary.pdf");
-      } catch (err) {
-        console.error("Error in PDF generation:", err);
-        alert("An error occurred while generating the PDF. Please try again.");
-      }
+      // Save the PDF
+      doc.save("job_summary.pdf");
+    } catch (err) {
+      console.error("Error in PDF generation:", err);
+      alert("An error occurred while generating the PDF. Please try again.");
     }
   };
 
@@ -235,16 +221,7 @@ function Chat() {
           <h3>Summary Preview</h3>
           <div className="summary-content">{summary}</div>
           <div className="download-buttons">
-            <button
-              onClick={() => downloadPDF("html")}
-              className="download-button"
-            >
-              Download as HTML
-            </button>
-            <button
-              onClick={() => downloadPDF("pdf")}
-              className="download-button"
-            >
+            <button onClick={() => downloadPDF()} className="download-button">
               Download as PDF
             </button>
           </div>
