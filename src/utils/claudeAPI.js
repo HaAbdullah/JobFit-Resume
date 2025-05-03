@@ -8,7 +8,11 @@ export const sendJobDescriptionToClaude = async (prompt) => {
     // For debugging
     console.log("Sending prompt to Claude API, length:", prompt.length);
 
-    const response = await fetch("/api/claude-api", {
+    // Replace with your actual Render service URL
+    const RENDER_API_URL =
+      "https://jobfit-backend-29ai.onrender.com/api/create-bullets";
+
+    const response = await fetch(RENDER_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

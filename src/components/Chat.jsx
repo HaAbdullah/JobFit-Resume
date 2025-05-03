@@ -103,27 +103,9 @@ function Chat() {
   const downloadPDF = (format = "html") => {
     if (!summary) return;
 
-    // Create HTML document with the summary
-    const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Job Summary</title>
-<style>
-  body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
-  h1 { text-align: center; margin-bottom: 30px; }
-  .summary { font-size: 16px; white-space: pre-line; }
-</style>
-</head>
-<body>
-<h1>Job Description Summary</h1>
-<div class="summary">${summary}</div>
-</body>
-</html>`;
-
     if (format === "html") {
       // Create blob and download link for HTML
-      const blob = new Blob([htmlContent], { type: "text/html" });
+      const blob = new Blob([summary], { type: "text/html" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -134,14 +116,14 @@ function Chat() {
       URL.revokeObjectURL(url);
     } else if (format === "pdf") {
       try {
-        // Create a PDF directly using jsPDF
+        // mm I love a4
         const doc = new jsPDF({
           orientation: "portrait",
           unit: "mm",
           format: "a4",
         });
 
-        // Parse the summary to remove any HTML tags
+        // Parse
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = summary;
         const cleanText = tempDiv.textContent || tempDiv.innerText || summary;
