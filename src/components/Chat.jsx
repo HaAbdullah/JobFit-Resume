@@ -28,6 +28,19 @@ function Chat() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!summary) return;
+
+    const iframe = document.getElementById("summary-preview");
+    if (!iframe) return;
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+
+    doc.open();
+    doc.write(summary);
+    doc.close();
+  }, [summary]);
+
   // RESUME UPLOAD HANDLERS
   const fileInputRef = useRef(null);
 
@@ -99,38 +112,36 @@ function Chat() {
       setIsLoading(false);
     }
   };
-  // Function to download as HTML or PDF
   const downloadPDF = () => {
     if (!summary) return;
+
     try {
-      // mm I love a4
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
+      // Open a new window
+      const printWindow = window.open("", "_blank", "width=800,height=600");
 
-      // Parse
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = summary;
-      const cleanText = tempDiv.textContent || tempDiv.innerText || summary;
+      if (!printWindow) {
+        alert("Pop-up blocked! Please allow pop-ups for this site.");
+        return;
+      }
 
-      // Set font size and add title
-      doc.setFontSize(18);
-      doc.text("Job Description Summary", 105, 20, { align: "center" });
+      // Write the summary HTML to the new window
+      printWindow.document.open();
+      printWindow.document.write(summary);
+      printWindow.document.close();
 
-      // Set font size for content
-      doc.setFontSize(12);
+      // Wait for the content to fully load before printing
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
 
-      // Split text into lines that fit the page width
-      const splitText = doc.splitTextToSize(cleanText, 170);
-      doc.text(splitText, 20, 40);
-
-      // Save the PDF
-      doc.save("job_summary.pdf");
+        // Optional: close the window after printing
+        printWindow.onafterprint = () => {
+          printWindow.close();
+        };
+      };
     } catch (err) {
-      console.error("Error in PDF generation:", err);
-      alert("An error occurred while generating the PDF. Please try again.");
+      console.error("Error during printing:", err);
+      alert("An error occurred while printing the document.");
     }
   };
 
@@ -202,7 +213,7 @@ function Chat() {
             disabled={!jobDescriptionInput.trim() || isLoading}
             className="generate-button"
           >
-            {isLoading ? "Generating..." : "Generate Summary"}
+            {isLoading ? "Generating..." : "Generate Resume"}
           </button>
         </div>
       )}
@@ -219,7 +230,19 @@ function Chat() {
       {summary && (
         <div className="summary-section">
           <h3>Summary Preview</h3>
-          <div className="summary-content">{summary}</div>
+
+          {/* Preview Iframe */}
+          <iframe
+            id="summary-preview"
+            style={{
+              width: "100%",
+              height: "600px",
+              border: "1px solid #ccc",
+              marginBottom: "1rem",
+            }}
+            title="Summary Preview"
+          />
+
           <div className="download-buttons">
             <button onClick={() => downloadPDF()} className="download-button">
               Download as PDF
