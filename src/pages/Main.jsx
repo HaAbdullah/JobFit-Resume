@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Chat from "../components/Chat";
+import Navbar from "../components/Navbar";
 import "../styles/Main.css";
 
 function Main() {
@@ -8,11 +9,19 @@ function Main() {
 
   return (
     <div className="claude-chat-container">
-      <h1>Resume Bullet Point Generator</h1>
-      <p className="instructions">
-        Enter your Resume and Paste a job description below to generate a
-        concise 3-line summary.
-      </p>
+      <Navbar />
+      <div className="jobfit-container">
+        <h1 className="jobfit-title">
+          Tailor-Made Resumes & Cover Letters
+          <br />
+          in <span className="jobfit-highlight">Seconds</span>
+        </h1>
+
+        <p className="jobfit-description">
+          Upload your best resumes and the job you want - JobFit blends them
+          into a polished, personalized application that gets noticed.
+        </p>
+      </div>
       <Chat conversation={conversation} setConversation={setConversation} />
     </div>
   );
