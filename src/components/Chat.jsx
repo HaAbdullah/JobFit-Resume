@@ -22,6 +22,11 @@ function Chat() {
   const [coverLetter, setCoverLetter] = useState("");
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
 
+  // New state for saved resumes
+  const [savedResumes, setSavedResumes] = useState([]);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [resumeName, setResumeName] = useState("");
+
   useEffect(() => {
     // Check if html2pdf is already loaded
     if (typeof window.html2pdf === "undefined") {
@@ -33,6 +38,20 @@ function Chat() {
       script.onerror = () => console.error("Failed to load html2pdf library");
       document.body.appendChild(script);
     }
+
+    // Load saved resumes from localStorage
+    const loadSavedResumes = () => {
+      try {
+        const savedResumesData = localStorage.getItem("savedResumes");
+        if (savedResumesData) {
+          setSavedResumes(JSON.parse(savedResumesData));
+        }
+      } catch (err) {
+        console.error("Error loading saved resumes:", err);
+      }
+    };
+
+    loadSavedResumes();
   }, []);
 
   useEffect(() => {
@@ -65,34 +84,60 @@ function Chat() {
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const handleFileUpload = async (event) => {
-    const file = event.target.files?.[0] || event.dataTransfer.files?.[0];
+    const files = event.target.files || event.dataTransfer.files;
 
-    if (!file) return;
+    if (!files || files.length === 0) return;
 
-    if (
-      file.type !== "application/pdf" &&
-      file.type !==
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ) {
-      setError("Please upload a PDF or DOCX file");
-      return;
+    setIsLoading(true);
+    setError(null);
+
+    const maxFiles = Math.min(files.length, 5);
+    let combinedText = "";
+    let processedCount = 0;
+    let hasError = false;
+
+    for (let i = 0; i < maxFiles; i++) {
+      const file = files[i];
+
+      if (
+        file.type !== "application/pdf" &&
+        file.type !==
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        // Skip invalid files but continue processing others
+        console.warn(`Skipping file ${file.name}: Invalid file type`);
+        continue;
+      }
+
+      try {
+        const extractedText = await processPDFResume(file);
+
+        // Add a separator between different resumes
+        if (combinedText && extractedText) {
+          combinedText += "\n\n--- NEXT RESUME ---\n\n";
+        }
+
+        combinedText += extractedText;
+        processedCount++;
+      } catch (error) {
+        console.error(`Error processing resume ${file.name}:`, error);
+        hasError = true;
+      }
     }
 
-    try {
-      setIsLoading(true);
-      setError(null);
+    if (processedCount > 0) {
+      setResume(combinedText);
+    }
 
-      const extractedText = await processPDFResume(file);
-      setResume(extractedText);
-      // setIsResumeSubmitted(true); // Auto submit if desired
-    } catch (error) {
-      console.error("Error processing resume:", error);
+    if (hasError) {
       setError(
-        "Failed to extract text from the resume. Try another file or paste the text."
+        processedCount > 0
+          ? `Processed ${processedCount} file(s), but some files couldn't be processed.`
+          : "Failed to extract text from the resume(s). Try different files or paste the text."
       );
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   const triggerFileInput = () => {
@@ -113,14 +158,22 @@ function Chat() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+
+    // Check if more than 5 files are dropped
+    if (e.dataTransfer.files.length > 5) {
+      setError("You can only upload up to 3 resume files at once");
+      return;
+    }
+
     handleFileUpload(e);
   };
 
   const handleSendResume = async () => {
     if (!resume.trim()) return;
     setIsResumeSubmitted(true);
-    // Additional logic after submitting resume
+    // No automatic save dialog
   };
+
   const clearResumeData = () => {
     setResume("");
     setError(null);
@@ -266,9 +319,50 @@ function Chat() {
     setGeneratingCoverLetter(false);
     setError("");
     setfinalClaudePrompt("");
+    setShowSaveDialog(false);
 
     // Scroll back to top (optional)
     window.scrollTo(0, 0);
+  };
+
+  // New functions for resume saving functionality
+  const saveResume = () => {
+    if (!resume.trim() || !resumeName.trim()) return;
+
+    const newSavedResumes = [
+      ...savedResumes,
+      {
+        id: Date.now().toString(),
+        name: resumeName,
+        content: resume,
+      },
+    ];
+
+    setSavedResumes(newSavedResumes);
+    localStorage.setItem("savedResumes", JSON.stringify(newSavedResumes));
+    setShowSaveDialog(false);
+    setResumeName("");
+  };
+
+  // Replace the current loadResume function with this updated version
+  const loadResume = (resumeContent) => {
+    // Check if there's already content in the resume textarea
+    if (resume.trim()) {
+      // If there's existing content, append a separator and the new content
+      setResume(
+        (prevResume) =>
+          `${prevResume}\n\n--- NEXT RESUME ---\n\n${resumeContent}`
+      );
+    } else {
+      // If there's no existing content, just set the resume content
+      setResume(resumeContent);
+    }
+  };
+
+  const deleteResume = (id) => {
+    const updatedResumes = savedResumes.filter((resume) => resume.id !== id);
+    setSavedResumes(updatedResumes);
+    localStorage.setItem("savedResumes", JSON.stringify(updatedResumes));
   };
 
   return (
@@ -277,10 +371,11 @@ function Chat() {
         <div className="upload-section">
           <input
             type="file"
-            accept=".pdf"
+            accept=".pdf,.docx"
             onChange={handleFileUpload}
             ref={fileInputRef}
             className="file-input"
+            multiple
             style={{ display: "none" }}
           />
           <h2 className="upload-title">
@@ -300,7 +395,7 @@ function Chat() {
                 <img src={uploadIcon} alt="Upload" className="upload-icon" />
               </div>
               <p className="upload-instruction">
-                Drag files here or click to upload
+                Drag files here or click to upload (up to 5 files)
               </p>
               <p className="upload-formats">Accepted formats: PDF, DOCX</p>
               <input
@@ -308,6 +403,7 @@ function Chat() {
                 accept=".pdf,.docx"
                 ref={fileInputRef}
                 onChange={handleFileUpload}
+                multiple
                 style={{ display: "none" }}
               />
             </div>
@@ -332,6 +428,42 @@ function Chat() {
               </div>
             </div>
           </div>
+
+          {/* Save Resume Button and Saved Resumes Display */}
+          <div className="saved-resumes-container">
+            {resume.trim() && !isLoading && (
+              <button
+                onClick={() => setShowSaveDialog(true)}
+                className="save-resume-button"
+              >
+                Save Current Resume
+              </button>
+            )}
+
+            {savedResumes.length > 0 && (
+              <>
+                <h3 className="saved-resumes-title">Your Saved Resumes</h3>
+                <div className="saved-resumes-list">
+                  {savedResumes.map((savedResume) => (
+                    <div key={savedResume.id} className="saved-resume-item">
+                      <span
+                        className="saved-resume-name"
+                        onClick={() => loadResume(savedResume.content)}
+                      >
+                        {savedResume.name}
+                      </span>
+                      <button
+                        className="delete-resume-button"
+                        onClick={() => deleteResume(savedResume.id)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -345,10 +477,46 @@ function Chat() {
         Submit Resume
       </button>
 
+      {/* Save Resume Dialog */}
+      {showSaveDialog && (
+        <div className="save-resume-dialog">
+          <div className="save-resume-content">
+            <h3>Save Your Resume</h3>
+            <p>Enter a name to save this resume for future use</p>
+            <input
+              type="text"
+              value={resumeName}
+              onChange={(e) => setResumeName(e.target.value)}
+              placeholder="Resume name (e.g. Software Developer)"
+              className="resume-name-input"
+              autoFocus
+            />
+            <div className="save-resume-buttons">
+              <button
+                onClick={() => {
+                  setShowSaveDialog(false);
+                  setResumeName("");
+                }}
+                className="cancel-save-button"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveResume}
+                className="confirm-save-button"
+                disabled={!resumeName.trim()}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isResumeSubmitted && (
         <div className="message-input">
           <h2 className="upload-title">
-            Add the job posting. We’ll analyze what the company is really
+            Add the job posting. We'll analyze what the company is really
             looking for.
           </h2>
           <div className="text-input-box">
