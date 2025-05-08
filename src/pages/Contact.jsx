@@ -81,7 +81,7 @@ const Contact = () => {
             <div className="mt-10 text-center">
               <p className="text-lg mb-2">Reach us anytime at:</p>
               <a
-                href="mailto:hello@jobfit.ai"
+                href="mailto:abdullah.hasanjee@gmail.com"
                 className="text-xl font-semibold text-green-800 hover:underline"
               >
                 📧 hello@jobfit.ai
