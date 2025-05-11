@@ -3,6 +3,7 @@ import { sendJobDescriptionToClaude } from "../utils/claudeAPI";
 import downloadIcon from "../assets/download.png";
 import rotateIcon from "../assets/rotate.png";
 import "../styles/JobAnalysis.css";
+import ChatInterface from "./ChatInterface";
 
 function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,6 +13,7 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
   const [summary, setSummary] = useState("");
   const [coverLetter, setCoverLetter] = useState("");
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
+  const [activeDocument, setActiveDocument] = useState(null);
 
   useEffect(() => {
     if (!summary) return;
@@ -24,7 +26,12 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
     doc.open();
     doc.write(summary);
     doc.close();
-  }, [summary]);
+
+    // Set active document to resume when summary is first generated
+    if (!activeDocument) {
+      setActiveDocument("resume");
+    }
+  }, [summary, activeDocument]);
 
   useEffect(() => {
     if (!coverLetter) return;
@@ -37,6 +44,9 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
     doc.open();
     doc.write(coverLetter);
     doc.close();
+
+    // Set active document to cover letter when it's first generated
+    setActiveDocument("coverLetter");
   }, [coverLetter]);
 
   const handleSendJobDescription = async () => {
@@ -45,6 +55,7 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
     setError("");
     setSummary("");
     setCoverLetter("");
+    setActiveDocument(null);
 
     // Create the prompt
     let createdPrompt =
@@ -156,6 +167,25 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
     }
   };
 
+  // Handler for updating the resume from chat
+  const handleUpdateResume = (newContent) => {
+    setSummary(newContent);
+  };
+
+  // Handler for updating the cover letter from chat
+  const handleUpdateCoverLetter = (newContent) => {
+    setCoverLetter(newContent);
+  };
+
+  // Handler for switching between resume and cover letter in chat
+  const switchToResume = () => {
+    setActiveDocument("resume");
+  };
+
+  const switchToCoverLetter = () => {
+    setActiveDocument("coverLetter");
+  };
+
   if (!isResumeSubmitted) {
     return null;
   }
@@ -211,7 +241,32 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
 
       {summary && (
         <div>
-          <div className="summary-section">
+          <div className="document-tabs">
+            <button
+              className={`tab-button ${
+                activeDocument === "resume" ? "active" : ""
+              }`}
+              onClick={switchToResume}
+            >
+              Resume
+            </button>
+            {coverLetter && (
+              <button
+                className={`tab-button ${
+                  activeDocument === "coverLetter" ? "active" : ""
+                }`}
+                onClick={switchToCoverLetter}
+              >
+                Cover Letter
+              </button>
+            )}
+          </div>
+
+          <div
+            className={`summary-section ${
+              activeDocument === "resume" ? "visible" : "hidden"
+            }`}
+          >
             {/* Preview Iframe */}
             <iframe
               id="summary-preview"
@@ -223,6 +278,7 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
               title="Resume Preview"
             />
           </div>
+
           <div className="action-buttons">
             <button onClick={onStartNewApplication} className="download-button">
               <img src={rotateIcon} alt="New Application" />
@@ -240,19 +296,22 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
       )}
 
       {coverLetter && (
-        <div>
-          <div className="summary-section">
-            {/* Cover Letter Preview Iframe */}
-            <iframe
-              id="cover-letter-preview"
-              style={{
-                width: "100%",
-                height: "600px",
-                border: "1px solid #ccc",
-              }}
-              title="Cover Letter Preview"
-            />
-          </div>
+        <div
+          className={`summary-section ${
+            activeDocument === "coverLetter" ? "visible" : "hidden"
+          }`}
+        >
+          {/* Cover Letter Preview Iframe */}
+          <iframe
+            id="cover-letter-preview"
+            style={{
+              width: "100%",
+              height: "600px",
+              border: "1px solid #ccc",
+            }}
+            title="Cover Letter Preview"
+          />
+
           <div className="action-buttons">
             <button onClick={onStartNewApplication} className="download-button">
               <img src={rotateIcon} alt="New Application" />
@@ -267,6 +326,18 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Chat Interface - Only visible when a document has been generated */}
+      {activeDocument && (
+        <ChatInterface
+          resume={resume}
+          jobDescriptionInput={jobDescriptionInput}
+          isGenerating={isLoading || generatingCoverLetter}
+          onUpdateResume={handleUpdateResume}
+          onUpdateCoverLetter={handleUpdateCoverLetter}
+          activeDocument={activeDocument}
+        />
       )}
     </div>
   );

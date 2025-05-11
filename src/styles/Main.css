@@ -33,18 +33,25 @@ body {
 
 /* Dark mode title */
 .dark .jobfit-title {
-  color: #2b9e81; /* Lighter green for dark mode */
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: color 0.3s;
 }
 
 /* Highlight text */
 .jobfit-highlight {
-  color: #67e9a4; /* Light green */
+  color: #67e9a4;
   transition: color 0.3s;
 }
 
 /* Dark mode highlight */
 .dark .jobfit-highlight {
-  color: #4dd28f; /* Slightly adjusted for dark mode */
+  background: linear-gradient(90deg, #e85f88, #8a64ff, #4a6bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Description text */

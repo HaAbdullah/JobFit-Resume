@@ -2,7 +2,7 @@ import React from "react";
 
 const How = () => {
   return (
-    <div className="pt-24 pb-16 transition-colors dark:bg-gray-950">
+    <div className="pt-24 pb-16 transition-colors dark:bg-[#1e1e1e]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-green-800 dark:text-emerald-400 mb-4 transition-colors">

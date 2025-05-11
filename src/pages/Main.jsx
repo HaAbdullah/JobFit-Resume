@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Chat from "../components/Chat";
+import How from "../pages/How";
 import Navbar from "../components/Navbar";
 import "../styles/Main.css";
 
@@ -23,6 +24,7 @@ function Main() {
         </p>
       </div>
       <Chat conversation={conversation} setConversation={setConversation} />
+      <How />
     </div>
   );
 }
