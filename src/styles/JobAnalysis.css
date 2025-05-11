@@ -1,0 +1,136 @@
+.message-input {
+  margin-top: 25px;
+}
+
+.generate-button {
+  margin: 20px;
+  width: 40%;
+  background-color: #42be94;
+  color: white;
+  padding: 12px 0;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.dark .generate-button {
+  background-color: #2b9e81;
+}
+
+.generate-button:disabled {
+  background-color: #a8d5c7;
+  cursor: not-allowed;
+}
+
+.dark .generate-button:disabled {
+  background-color: #25574c;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+  color: #2c3e50;
+  transition: color 0.3s;
+}
+
+.dark .loading {
+  color: #a0b0c0;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #42be94;
+  animation: spin 1s ease infinite;
+  margin-bottom: 10px;
+  transition: border-color 0.3s;
+}
+
+.dark .spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #2b9e81;
+}
+
+.loading-subtext {
+  color: #95a5a6;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.dark .loading-subtext {
+  color: #768485;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.summary-section {
+  margin: 0 auto;
+  width: 80%;
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+
+.dark .summary-section {
+  border-color: #444;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.download-button {
+  margin: 20px;
+  width: 40%;
+  background-color: #42be94;
+  color: white;
+  padding: 12px 0;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark .download-button {
+  background-color: #2b9e81;
+}
+
+.download-button:hover {
+  background-color: #35a07c;
+}
+
+.dark .download-button:hover {
+  background-color: #238e71;
+}
+
+.download-button img {
+  height: 20px;
+  width: 20px;
+  margin-right: 8px;
+}

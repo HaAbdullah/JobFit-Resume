@@ -10,63 +10,86 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    // Handle scroll for navbar appearance
+    // Initialize theme from localStorage or default to dark
+    const savedTheme = localStorage.getItem("theme");
+    // Make dark mode the default (only light mode if explicitly set)
+    const prefersDark = savedTheme !== "light";
+    setDarkMode(prefersDark);
+    document.documentElement.classList.toggle("dark", prefersDark);
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 10);
     };
 
-    // Handle resize for responsive layout
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    // Initial check
     handleResize();
-
-    // Set up event listeners
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
 
-    // Clean up
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    document.documentElement.classList.toggle("dark", newMode);
+    localStorage.setItem("theme", newMode ? "dark" : "light");
   };
 
   const handleNavClick = () => {
-    if (mobileMenuOpen) {
-      setMobileMenuOpen(false);
-    }
+    if (mobileMenuOpen) setMobileMenuOpen(false);
   };
 
-  // Mobile navbar layout
+  // Enhanced base background styles for better dark mode appearance
+  const baseBg = scrolled
+    ? "bg-white dark:bg-gray-900 bg-opacity-90 dark:bg-opacity-80 backdrop-blur-sm shadow-md rounded-full"
+    : "bg-white dark:bg-gray-900";
+
+  // Mobile version
   if (isMobile) {
     return (
       <>
-        {/* Top navbar */}
-        <div className="fixed top-0 left-0 right-0 w-full flex justify-between items-center px-4 py-4 bg-white shadow-sm z-50">
-          <div className="flex-1">
-            <Link to="/" className="text-green-800 font-bold text-xl font-sans">
-              JobFit
-            </Link>
-          </div>
-          <div className="flex items-center">
-            {/* Hamburger menu button */}
+        <div
+          className={`fixed top-0 left-0 right-0 w-full flex justify-between items-center px-4 py-4 ${baseBg} z-50 transition-all duration-300`}
+        >
+          <Link
+            to="/"
+            className="text-green-800 dark:text-emerald-400 font-bold text-xl font-sans"
+          >
+            JobFit
+          </Link>
+          <div className="flex items-center space-x-3">
+            {/* Dark mode toggle - enhanced styling */}
             <button
-              className="mr-4 text-gray-700 focus:outline-none"
+              onClick={toggleDarkMode}
+              className="w-12 h-6 bg-gray-300 dark:bg-gray-700 rounded-full p-1 relative focus:outline-none transition-colors"
+              aria-label="Toggle theme"
+            >
+              <span
+                className={`block w-4 h-4 bg-white dark:bg-emerald-400 rounded-full shadow-md transform transition-transform duration-300 ${
+                  darkMode ? "translate-x-6" : "translate-x-0"
+                }`}
+              ></span>
+            </button>
+
+            {/* Menu toggle */}
+            <button
               onClick={toggleMobileMenu}
-              aria-label="Toggle navigation menu"
+              className="text-gray-700 dark:text-gray-200 focus:outline-none"
+              aria-label="Toggle menu"
             >
               <svg
                 className="w-6 h-6"
@@ -92,23 +115,19 @@ const Navbar = () => {
                 )}
               </svg>
             </button>
+
             {isAuthenticated ? (
               <Link to="/account">
                 <img
                   src={currentUser?.photoURL || defaultUserIcon}
                   alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover cursor-pointer"
-                  title={currentUser.displayName || "Profile"}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = defaultUserIcon;
-                  }}
+                  className="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-transparent dark:border-emerald-500"
                 />
               </Link>
             ) : (
               <Link
                 to="/signup"
-                className="bg-green-800 text-white font-semibold px-4 py-2 rounded-full hover:bg-opacity-90 transition-colors text-sm"
+                className="bg-green-700 dark:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-full hover:bg-opacity-90 text-sm transition-all duration-300 shadow-sm dark:shadow-emerald-500/20"
               >
                 Sign Up
               </Link>
@@ -116,46 +135,27 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu dropdown */}
         <div
-          className={`fixed top-16 inset-x-0 z-40 bg-white shadow-md transform transition-transform duration-300 ${
+          className={`fixed top-16 inset-x-0 z-40 bg-white dark:bg-gray-900 shadow-md dark:shadow-emerald-500/5 transform transition-transform duration-300 ${
             mobileMenuOpen ? "translate-y-0" : "-translate-y-full"
           }`}
         >
           <div className="px-4 py-3 space-y-2">
-            <Link
-              to="/"
-              onClick={handleNavClick}
-              className="block py-2 text-gray-800 hover:text-green-800"
-            >
-              Home
-            </Link>
-            <Link
-              to="/why"
-              onClick={handleNavClick}
-              className="block py-2 text-gray-800 hover:text-green-800"
-            >
-              Why JobFit?
-            </Link>
-            <Link
-              to="/how"
-              onClick={handleNavClick}
-              className="block py-2 text-gray-800 hover:text-green-800"
-            >
-              How It Works
-            </Link>
-            <Link
-              to="/contact"
-              onClick={handleNavClick}
-              className="block py-2 text-gray-800 hover:text-green-800"
-            >
-              Contact Us
-            </Link>
+            {["/", "/why", "/how", "/contact"].map((path, i) => (
+              <Link
+                key={path}
+                to={path}
+                onClick={handleNavClick}
+                className="block py-2 text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
+              >
+                {["Home", "Why JobFit?", "How It Works", "Contact Us"][i]}
+              </Link>
+            ))}
             {!isAuthenticated && (
               <Link
                 to="/login"
                 onClick={handleNavClick}
-                className="block py-2 text-gray-800 hover:text-green-800"
+                className="block py-2 text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
               >
                 Log In
               </Link>
@@ -166,76 +166,67 @@ const Navbar = () => {
     );
   }
 
-  // Desktop navbar layout - single navbar with all elements aligned
+  // Desktop version
   return (
     <div
-      className={`${
+      className={`px-8 py-4 flex items-center justify-between z-40 transition-all duration-300 ${
         scrolled
-          ? "fixed top-4 left-0 right-0 mx-auto max-w-6xl bg-white bg-opacity-90 backdrop-blur-sm shadow-md rounded-full"
-          : "absolute top-0 left-0 right-0 w-full bg-white"
-      } px-8 py-4 flex items-center justify-between z-40 transition-all duration-300`}
+          ? "fixed top-4 left-0 right-0 mx-auto max-w-6xl"
+          : "absolute top-0 left-0 right-0 w-full"
+      } ${baseBg}`}
     >
-      {/* Logo on the left */}
-      <div>
-        <Link to="/" className="text-green-800 font-bold text-2xl font-sans">
-          JobFit
-        </Link>
-      </div>
+      <Link
+        to="/"
+        className="text-green-800 dark:text-emerald-400 font-bold text-2xl font-sans"
+      >
+        JobFit
+      </Link>
 
-      {/* Navigation in the center */}
       <div className="flex items-center space-x-8">
-        <Link
-          to="/"
-          className="text-gray-800 font-normal hover:text-green-800 transition-colors"
-        >
-          Home
-        </Link>
-        <Link
-          to="/why"
-          className="text-gray-800 font-normal hover:text-green-800 transition-colors"
-        >
-          Why JobFit?
-        </Link>
-        <Link
-          to="/how"
-          className="text-gray-800 font-normal hover:text-green-800 transition-colors"
-        >
-          How It Works
-        </Link>
-        <Link
-          to="/contact"
-          className="text-gray-800 font-normal hover:text-green-800 transition-colors"
-        >
-          Contact Us
-        </Link>
+        {["/", "/why", "/how", "/contact"].map((path, i) => (
+          <Link
+            key={path}
+            to={path}
+            className="text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
+          >
+            {["Home", "Why JobFit?", "How It Works", "Contact Us"][i]}
+          </Link>
+        ))}
       </div>
 
-      {/* Sign Up/Login buttons on the right */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-4">
+        {/* Dark mode toggle - enhanced */}
+        <button
+          onClick={toggleDarkMode}
+          className="w-12 h-6 bg-gray-300 dark:bg-gray-700 rounded-full p-1 relative focus:outline-none transition-colors"
+          aria-label="Toggle theme"
+        >
+          <span
+            className={`block w-4 h-4 bg-white dark:bg-emerald-400 rounded-full shadow-md transform transition-transform duration-300 ${
+              darkMode ? "translate-x-6" : "translate-x-0"
+            }`}
+          ></span>
+        </button>
+
         {isAuthenticated ? (
           <Link to="/account">
             <img
               src={currentUser?.photoURL || defaultUserIcon}
               alt="Profile"
-              className="w-10 h-10 rounded-full object-cover cursor-pointer"
-              title={currentUser.displayName || "Profile"}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = defaultUserIcon;
-              }}
+              className="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-transparent dark:border-emerald-500"
             />
           </Link>
         ) : (
           <>
             <Link
               to="/login"
-              className="text-green-800 font-semibold hover:text-green-700 transition-colors"
+              className="text-green-800 dark:text-emerald-400 font-semibold hover:text-green-700 dark:hover:text-emerald-300 transition-colors"
             >
               Log In
             </Link>
             <Link
               to="/signup"
-              className="bg-green-800 text-white font-semibold px-6 py-2 rounded-full hover:bg-opacity-90 transition-colors"
+              className="bg-green-700 dark:bg-emerald-600 text-white font-semibold px-6 py-2 rounded-full hover:bg-opacity-90 transition-colors shadow-sm dark:shadow-emerald-500/20"
             >
               Sign Up
             </Link>

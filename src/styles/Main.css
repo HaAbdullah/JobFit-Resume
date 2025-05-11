@@ -1,7 +1,15 @@
+/* Base styles */
 body {
   font-family: "Inter", sans-serif;
   background-color: #ffffff;
-  color: #000000;
+  color: #1a1a1a;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode styles */
+.dark body {
+  background-color: #1e1e1e; /* Dark gray instead of pure black */
+  color: #f0f0f0;
 }
 
 /* JobFit container */
@@ -20,18 +28,36 @@ body {
   line-height: 1.2;
   margin-top: 1%;
   margin-bottom: 1%;
+  transition: color 0.3s;
+}
+
+/* Dark mode title */
+.dark .jobfit-title {
+  color: #2b9e81; /* Lighter green for dark mode */
 }
 
 /* Highlight text */
 .jobfit-highlight {
   color: #67e9a4; /* Light green */
+  transition: color 0.3s;
+}
+
+/* Dark mode highlight */
+.dark .jobfit-highlight {
+  color: #4dd28f; /* Slightly adjusted for dark mode */
 }
 
 /* Description text */
 .jobfit-description {
   font-size: 1.1rem;
   line-height: 1.5;
-  color: #000000;
+  color: #1a1a1a;
   max-width: 600px;
   margin: 0 auto;
+  transition: color 0.3s;
+}
+
+/* Dark mode description */
+.dark .jobfit-description {
+  color: #e0e0e0;
 }

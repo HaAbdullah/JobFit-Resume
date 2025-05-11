@@ -1,0 +1,153 @@
+/* Style for both boxes */
+.upload-box,
+.text-input-box {
+  flex: 1;
+  border: 2px solid #ddfee9;
+  border-radius: 12px;
+  background-color: #fff;
+  box-sizing: border-box;
+  height: 350px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.dark .upload-box,
+.dark .text-input-box {
+  background-color: #2a2a2a;
+  border-color: #1f5e4c;
+}
+
+/* Left upload box */
+.upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.upload-icon-container {
+  margin-bottom: 16px;
+}
+
+.upload-icon {
+  width: 90px;
+  height: 90px;
+}
+.dark .upload-icon {
+  filter: invert(1);
+}
+.upload-instruction {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+  transition: color 0.3s;
+}
+
+.dark .upload-instruction {
+  color: #d0d0d0;
+}
+
+.upload-formats {
+  font-size: 12px;
+  color: #666;
+  transition: color 0.3s;
+}
+
+.dark .upload-formats {
+  color: #aaa;
+}
+
+.textarea-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Right textarea box */
+.text-input-box {
+  padding: 0;
+}
+
+.text-input-box textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: transparent;
+  transition: color 0.3s;
+}
+
+.dark .text-input-box textarea {
+  color: #e0e0e0;
+}
+
+.clear-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.3s;
+}
+
+.dark .clear-button {
+  background-color: #d14242;
+}
+
+.clear-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.text-input-box textarea:focus {
+  outline: none;
+}
+
+.text-input-box textarea::placeholder {
+  color: #999;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.dark .text-input-box textarea::placeholder {
+  color: #777;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .upload-area-container {
+    flex-direction: column;
+  }
+
+  .upload-box,
+  .text-input-box {
+    width: 100%;
+  }
+}
+
+.submit-resume-button {
+  margin-top: 20px;
+  width: 80%;
+  background-color: #42be94;
+  color: white;
+  padding: 12px 0;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+}

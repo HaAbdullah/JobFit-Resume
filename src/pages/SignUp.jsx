@@ -15,13 +15,13 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#1e1e1e] py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 transition-colors">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-800 mb-2">
+          <h1 className="text-3xl font-bold text-green-800 dark:text-green-500 mb-2 transition-colors">
             Create Your JobFit Account
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400 transition-colors">
             Find the perfect job match with AI-powered insights
           </p>
         </div>
@@ -30,7 +30,7 @@ const SignUp = () => {
           <button
             type="button"
             onClick={handleGoogleSignUp}
-            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-600 dark:focus:ring-offset-gray-800 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -55,11 +55,11 @@ const SignUp = () => {
 
           <div className="flex items-center justify-center">
             <div className="text-sm">
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400 transition-colors">
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="font-medium text-green-800 hover:text-green-700"
+                  className="font-medium text-green-800 dark:text-green-500 hover:text-green-700 dark:hover:text-green-400 transition-colors"
                 >
                   Log in
                 </Link>
