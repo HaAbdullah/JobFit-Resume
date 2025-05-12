@@ -5,7 +5,7 @@ const How = () => {
     <div className="pt-24 pb-16 transition-colors dark:bg-[#1e1e1e]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-green-800 dark:text-emerald-400 mb-4 transition-colors">
+          <h1 className="text-4xl font-bold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text mb-4 transition-colors">
             Built with AI. Designed for Results.
           </h1>
           <p className="text-xl max-w-3xl mx-auto text-gray-900 dark:text-gray-200 transition-colors">
@@ -17,10 +17,10 @@ const How = () => {
 
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-emerald-500/5 p-8 mb-8 transition-colors">
           <div className="mb-12">
-            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-emerald-600 text-white rounded-full mb-4 transition-colors shadow-sm">
+            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white rounded-full mb-4 transition-colors shadow-sm">
               Step 1
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-50 transition-colors">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
               Upload Your Resume(s)
             </h2>
             <p className="text-lg mb-4 text-gray-800 dark:text-gray-300 transition-colors">
@@ -40,10 +40,10 @@ const How = () => {
           </div>
 
           <div className="mb-12">
-            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-emerald-600 text-white rounded-full mb-4 transition-colors shadow-sm">
+            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white rounded-full mb-4 transition-colors shadow-sm">
               Step 2
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-50 transition-colors">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
               Add the Job Description
             </h2>
             <p className="text-lg mb-4 text-gray-800 dark:text-gray-300 transition-colors">
@@ -64,10 +64,10 @@ const How = () => {
           </div>
 
           <div className="mb-12">
-            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-emerald-600 text-white rounded-full mb-4 transition-colors shadow-sm">
+            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white rounded-full mb-4 transition-colors shadow-sm">
               Step 3
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-50 transition-colors">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
               Intelligent Matching & Rewrite
             </h2>
             <p className="text-lg mb-4 text-gray-800 dark:text-gray-300 transition-colors">
@@ -77,7 +77,7 @@ const How = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
               <div className="bg-green-50 dark:bg-emerald-900/20 p-5 rounded-lg transition-colors">
                 <div className="text-2xl mb-2">🤖</div>
-                <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-50 transition-colors">
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
                   AI-Powered Tailoring
                 </h3>
                 <p className="text-gray-800 dark:text-gray-300 transition-colors">
@@ -88,7 +88,7 @@ const How = () => {
               </div>
               <div className="bg-green-50 dark:bg-emerald-900/20 p-5 rounded-lg transition-colors">
                 <div className="text-2xl mb-2">🧠</div>
-                <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-50 transition-colors">
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
                   Strength Prioritization
                 </h3>
                 <p className="text-gray-800 dark:text-gray-300 transition-colors">
@@ -98,7 +98,7 @@ const How = () => {
               </div>
               <div className="bg-green-50 dark:bg-emerald-900/20 p-5 rounded-lg transition-colors">
                 <div className="text-2xl mb-2">🧾</div>
-                <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-50 transition-colors">
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
                   ATS Optimization
                 </h3>
                 <p className="text-gray-800 dark:text-gray-300 transition-colors">
@@ -111,10 +111,10 @@ const How = () => {
           </div>
 
           <div>
-            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-emerald-600 text-white rounded-full mb-4 transition-colors shadow-sm">
+            <div className="inline-block px-4 py-2 bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white rounded-full mb-4 transition-colors shadow-sm">
               Step 4
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-50 transition-colors">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
               Download and Apply Confidently
             </h2>
             <p className="text-lg mb-4 text-gray-800 dark:text-gray-300 transition-colors">
@@ -138,7 +138,7 @@ const How = () => {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-2xl font-semibold text-green-800 dark:text-emerald-400 transition-colors">
+          <p className="text-2xl font-semibold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
             Bottom line: 📈 JobFit helps you apply smarter — not harder.
           </p>
         </div>
