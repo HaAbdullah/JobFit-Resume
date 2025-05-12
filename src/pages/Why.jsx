@@ -5,7 +5,7 @@ const Why = () => {
     <div className="pt-24 pb-16 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-green-800 dark:text-green-500 mb-4 transition-colors">
+          <h1 className="text-4xl font-bold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text mb-4 transition-colors">
             Most People Use One Resume for Every Job. That's Why They Don't Get
             Interviews.
           </h1>
@@ -17,7 +17,7 @@ const Why = () => {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12 transition-colors">
-          <h2 className="text-2xl font-bold text-green-800 dark:text-green-500 mb-6 transition-colors">
+          <h2 className="text-2xl font-bold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text mb-6 transition-colors">
             Why it works:
           </h2>
 
@@ -84,7 +84,7 @@ const Why = () => {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-2xl font-semibold text-green-800 dark:text-green-500 transition-colors">
+          <p className="text-2xl font-semibold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
             Bottom line: More relevant applications = more callbacks.
           </p>
         </div>

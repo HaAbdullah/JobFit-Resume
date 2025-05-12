@@ -47,7 +47,7 @@ const Contact = () => {
     <div className="pt-24 pb-16 transition-colors" id="contact">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-green-800 dark:text-green-500 mb-4 transition-colors">
+          <h1 className="text-4xl font-bold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text mb-4 transition-colors">
             Questions? Feedback? Just Say Hi.
           </h1>
           <p className="text-xl text-gray-900 dark:text-gray-200 transition-colors">
@@ -92,7 +92,7 @@ const Contact = () => {
               </p>
               <a
                 href="mailto:abdullah.hasanjee@gmail.com"
-                className="text-xl font-semibold text-green-800 dark:text-green-500 hover:underline transition-colors"
+                className="text-xl font-semibold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text hover:underline transition-colors"
               >
                 📧 hello@jobfit.ai
               </a>
@@ -103,7 +103,7 @@ const Contact = () => {
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 transition-colors">
-            <h2 className="text-2xl font-bold text-green-800 dark:text-green-500 mb-6 text-center transition-colors">
+            <h2 className="text-2xl font-bold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text mb-6 text-center transition-colors">
               Send Us a Message
             </h2>
 
@@ -149,7 +149,7 @@ const Contact = () => {
               <div className="text-center">
                 <button
                   type="submit"
-                  className="bg-green-800 dark:bg-green-700 text-white font-semibold px-8 py-3 rounded-full hover:bg-opacity-90 transition-colors"
+                  className="bg-green-800 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white font-semibold px-8 py-3 rounded-full hover:bg-opacity-90 transition-colors"
                 >
                   SUBMIT
                 </button>
