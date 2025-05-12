@@ -46,12 +46,11 @@ body {
   transition: color 0.3s;
 }
 
-/* Dark mode highlight */
 .dark .jobfit-highlight {
-  background: linear-gradient(90deg, #e85f88, #8a64ff, #4a6bff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  border-bottom: 3px solid #e85f88; /* thinner underline */
 }
 
 /* Description text */
