@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Chat from "../components/Chat";
 import How from "../pages/How";
 import Navbar from "../components/Navbar";
-import HeroImage from "../assets/Hero1.jpg";
+import HeroImage from "../assets/hero1.jpg";
 import "../styles/Main.css";
 
 function Main() {
