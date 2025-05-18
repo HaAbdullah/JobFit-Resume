@@ -30,7 +30,7 @@
 }
 
 .dark .submit-resume-button {
-  background-color: #2b9e81;
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
 }
 
 .submit-resume-button:disabled {
@@ -54,7 +54,8 @@
 
 .dark .saved-resumes-container {
   background-color: #262f2c;
-  border-color: #1f5e4c;
+  border: 1px solid;
+  border-image: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88) 1;
 }
 
 .saved-resumes-title {
@@ -87,7 +88,8 @@
 
 .dark .saved-resume-item {
   background-color: #1c3f36;
-  border-color: #2b9e81;
+  border: 1px solid;
+  border-image: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88) 1;
 }
 
 .saved-resume-name {
@@ -107,7 +109,10 @@
 }
 
 .dark .saved-resume-name:hover {
-  color: #4dd28f;
+  color: transparent;
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .delete-resume-button {
@@ -148,7 +153,7 @@
 }
 
 .dark .save-resume-button {
-  background-color: #2b9e81;
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
 }
 
 .save-resume-button:hover {
@@ -156,7 +161,7 @@
 }
 
 .dark .save-resume-button:hover {
-  background-color: #238e71;
+  background: linear-gradient(90deg, #5a7bff, #9a74ff, #f86f98);
 }
 
 /* Save Resume Dialog */
@@ -239,7 +244,15 @@
 }
 
 .dark .resume-name-input:focus {
-  border-color: #2b9e81;
+  border: none;
+  outline: 1px solid transparent;
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
+  padding: 9px;
+  border-radius: 6px;
+}
+
+.dark .resume-name-input:focus::placeholder {
+  color: transparent;
 }
 
 .save-resume-buttons {
@@ -275,7 +288,7 @@
 }
 
 .dark .confirm-save-button {
-  background-color: #2b9e81;
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
 }
 
 .confirm-save-button:disabled {

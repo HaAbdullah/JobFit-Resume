@@ -12,12 +12,43 @@ body {
   color: #f0f0f0;
 }
 
-/* JobFit container */
-.jobfit-container {
-  max-width: 100%;
+/* JobFit hero section layout */
+.jobfit-hero-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px 0px 20px;
-  text-align: center;
+  gap: 30px;
+}
+
+/* Content container (left side) */
+.jobfit-content {
+  flex: 1;
+  text-align: left;
+  max-width: 600px;
+}
+
+/* Image container (right side) */
+.jobfit-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.jobfit-image img {
+  max-width: 80%;
+  height: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+}
+
+/* Dark mode image styling */
+.dark .jobfit-image img {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 /* Main title */
@@ -58,12 +89,27 @@ body {
   font-size: 1.1rem;
   line-height: 1.5;
   color: #1a1a1a;
-  max-width: 600px;
-  margin: 0 auto;
+  margin-top: 15px;
   transition: color 0.3s;
 }
 
 /* Dark mode description */
 .dark .jobfit-description {
   color: #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .jobfit-hero-section {
+    flex-direction: column;
+  }
+
+  .jobfit-content {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .jobfit-title {
+    font-size: 250%;
+  }
 }
