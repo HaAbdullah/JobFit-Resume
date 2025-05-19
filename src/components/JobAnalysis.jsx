@@ -5,7 +5,17 @@ import rotateIcon from "../assets/rotate.png";
 import "../styles/JobAnalysis.css";
 import ChatInterface from "./ChatInterface";
 
-function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
+function JobAnalysis({
+  resume,
+  isResumeSubmitted,
+  onStartNewApplication,
+  jobDescription,
+  setJobDescription,
+  isJobDescriptionSubmitted,
+  setIsJobDescriptionSubmitted,
+  analysisResults,
+  setAnalysisResults,
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [jobDescriptionInput, setJobDescriptionInput] = useState("");
   const [finalClaudePrompt, setFinalClaudePrompt] = useState("");
@@ -57,15 +67,20 @@ function JobAnalysis({ resume, isResumeSubmitted, onStartNewApplication }) {
     setCoverLetter("");
     setActiveDocument(null);
 
-    // Create the prompt
     let createdPrompt =
       "RESUME\n" + resume + "\nJOB DESCRIPTION\n" + jobDescriptionInput;
     setFinalClaudePrompt(createdPrompt);
 
     try {
-      // Use the createdPrompt directly instead of finalClaudePrompt state
       const response = await sendJobDescriptionToClaude(createdPrompt);
       setSummary(response.content[0].text);
+
+      // Update the parent component's state - this is critical!
+      setJobDescription(jobDescriptionInput);
+      setIsJobDescriptionSubmitted(true);
+      if (setAnalysisResults) {
+        setAnalysisResults(response.content[0].text);
+      }
     } catch (err) {
       setError(err.message);
     } finally {

@@ -1,0 +1,112 @@
+/* TabsContainer.css */
+.tabs-container {
+  font-family: "Inter", sans-serif;
+  margin-top: 30px;
+  background-color: #f5fbf8;
+  border-radius: 12px;
+  border: 1px solid #ddfee9;
+  padding: 20px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.dark .tabs-container {
+  background-color: #1e2023;
+  border: 1px solid;
+  border-image: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88) 1;
+}
+
+.tabs-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .tabs-header {
+    flex-direction: column;
+  }
+}
+
+.tab-button {
+  padding: 10px 16px;
+  background-color: #e9f9f3;
+  border: 1px solid #42be94;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.dark .tab-button {
+  background-color: #2a2d31;
+  border: 1px solid #3a3d42;
+  color: #d0d0d0;
+}
+
+.tab-button:hover {
+  background-color: #ddfee9;
+}
+
+.dark .tab-button:hover {
+  background-color: #3a3e45;
+}
+
+.tab-button.active {
+  background-color: #42be94;
+  color: white;
+  border-color: #35a07c;
+}
+
+.dark .tab-button.active {
+  background: linear-gradient(90deg, #4a6bff, #8a64ff, #e85f88);
+  color: white;
+  border: none;
+}
+
+.tab-content-container {
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #e6f4ef;
+  padding: 20px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.dark .tab-content-container {
+  background-color: #16181c;
+  border-color: #2d2f36;
+}
+
+.tab-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  transition: color 0.3s;
+}
+
+.dark .tab-title {
+  color: #e0e0e0;
+}
+
+.tab-content {
+  min-height: 200px; /* Ensure tab content area has minimum height */
+}
+
+/* Animations for tab transitions */
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

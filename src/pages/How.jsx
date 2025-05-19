@@ -13,7 +13,7 @@ const How = () => {
               </h1>
 
               <p className="text-xl text-gray-900 dark:text-gray-200 transition-colors mb-6">
-                Submit your resume and dream job—JobFitt builds your
+                Submit your resume and dream job—JobFitt.ai builds your
                 ATS-optimized resume, cover letter, employer analysis, and
                 interview roadmap to clear automated screeners.
               </p>
@@ -28,7 +28,7 @@ const How = () => {
           <div className="md:w-1/2 nm">
             <img
               src={HeroImage}
-              alt="JobFitt AI career optimization"
+              alt="JobFitt.ai career optimization"
               className="rounded-lg shadow-lg object-cover max-h-90 w-full"
             />
           </div>
@@ -52,7 +52,7 @@ const How = () => {
               </p>
               <p className="text-gray-800 dark:text-gray-300 transition-colors">
                 We use multiple natural language models to analyze your career
-                from different angles. This gives JobFit more flexibility in
+                from different angles. This gives JobFitt.ai more flexibility in
                 choosing the strongest points for each unique application.
               </p>
             </div>
@@ -158,7 +158,7 @@ const How = () => {
 
         <div className="text-center mt-8">
           <p className="text-2xl font-semibold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
-            Bottom line: 📈 JobFit helps you apply smarter — not harder.
+            Bottom line: 📈 JobFitt.ai helps you apply smarter — not harder.
           </p>
         </div>
       </div>

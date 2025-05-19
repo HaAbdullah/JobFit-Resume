@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ResumeUpload from "./ResumeUpload";
 import JobAnalysis from "./JobAnalysis";
+import TabsContainer from "./TabsContainer";
 import "../styles/Chat.css";
 
 function Chat() {
@@ -9,6 +10,10 @@ function Chat() {
   const [resume, setResume] = useState("");
   const [error, setError] = useState("");
   const [savedResumes, setSavedResumes] = useState([]);
+  const [jobDescription, setJobDescription] = useState("");
+  const [isJobDescriptionSubmitted, setIsJobDescriptionSubmitted] =
+    useState(false);
+  const [analysisResults, setAnalysisResults] = useState(null);
 
   useEffect(() => {
     // Check if html2pdf is already loaded
@@ -37,10 +42,30 @@ function Chat() {
     loadSavedResumes();
   }, []);
 
+  // Add a debug log to monitor state changes
+  useEffect(() => {
+    console.log("Chat State Updated:", {
+      isResumeSubmitted,
+      isJobDescriptionSubmitted,
+      resumeLength: resume?.length,
+      jobDescriptionLength: jobDescription?.length,
+      hasAnalysisResults: !!analysisResults,
+    });
+  }, [
+    isResumeSubmitted,
+    isJobDescriptionSubmitted,
+    resume,
+    jobDescription,
+    analysisResults,
+  ]);
+
   const handleStartNewApplication = () => {
     // Reset all state
     setResume("");
     setIsResumeSubmitted(false);
+    setJobDescription("");
+    setIsJobDescriptionSubmitted(false);
+    setAnalysisResults(null);
     setError("");
 
     // Scroll back to top
@@ -67,6 +92,20 @@ function Chat() {
         resume={resume}
         isResumeSubmitted={isResumeSubmitted}
         onStartNewApplication={handleStartNewApplication}
+        jobDescription={jobDescription}
+        setJobDescription={setJobDescription}
+        isJobDescriptionSubmitted={isJobDescriptionSubmitted}
+        setIsJobDescriptionSubmitted={setIsJobDescriptionSubmitted}
+        analysisResults={analysisResults}
+        setAnalysisResults={setAnalysisResults}
+      />
+
+      <TabsContainer
+        resume={resume}
+        jobDescription={jobDescription}
+        analysisResults={analysisResults}
+        isJobDescriptionSubmitted={isJobDescriptionSubmitted}
+        isResumeSubmitted={isResumeSubmitted}
       />
     </div>
   );

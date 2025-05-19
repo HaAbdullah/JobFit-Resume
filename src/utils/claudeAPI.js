@@ -5,9 +5,9 @@
  */
 export const sendJobDescriptionToClaude = async (prompt) => {
   try {
-    // For debugging
     console.log("Sending prompt to Claude API, length:", prompt.length);
-    const isLocalhost = window.location.hostname === "localhost";
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
 
     const API_BASE_URL = isLocalhost
       ? "http://localhost:3000/api"
@@ -18,9 +18,7 @@ export const sendJobDescriptionToClaude = async (prompt) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        jobDescription: prompt, // Send the full prompt as jobDescription
-      }),
+      body: JSON.stringify({ jobDescription: prompt }),
     });
 
     if (!response.ok) {
@@ -42,12 +40,12 @@ export const sendJobDescriptionToClaude = async (prompt) => {
  */
 export const sendCoverLetterToClaude = async (prompt) => {
   try {
-    // For debugging
     console.log(
       "Sending cover letter prompt to Claude API, length:",
       prompt.length
     );
-    const isLocalhost = window.location.hostname === "localhost";
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
 
     const API_BASE_URL = isLocalhost
       ? "http://localhost:3000/api"
@@ -58,9 +56,7 @@ export const sendCoverLetterToClaude = async (prompt) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        jobDescription: prompt, // Send the full prompt
-      }),
+      body: JSON.stringify({ jobDescription: prompt }),
     });
 
     if (!response.ok) {
@@ -90,7 +86,6 @@ export const sendChatFeedbackToClaude = async (
   userFeedback
 ) => {
   try {
-    // Create a comprehensive prompt with all context
     const feedbackPrompt =
       originalPrompt +
       `\n\nCURRENT ${documentType.toUpperCase()}\n` +
@@ -102,12 +97,12 @@ export const sendChatFeedbackToClaude = async (
       feedbackPrompt.length
     );
 
-    const isLocalhost = window.location.hostname === "localhost";
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
     const API_BASE_URL = isLocalhost
       ? "http://localhost:3000/api"
       : "https://jobfit-backend-29ai.onrender.com/api";
 
-    // Use the appropriate endpoint based on document type
     const endpoint =
       documentType === "resume" ? "create-resume" : "create-cover-letter";
 
@@ -116,9 +111,7 @@ export const sendChatFeedbackToClaude = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        jobDescription: feedbackPrompt,
-      }),
+      body: JSON.stringify({ jobDescription: feedbackPrompt }),
     });
 
     if (!response.ok) {
@@ -132,6 +125,44 @@ export const sendChatFeedbackToClaude = async (
       `Error calling Claude API for ${documentType} feedback:`,
       error
     );
+    throw error;
+  }
+};
+
+/**
+ * Sends a job description to Claude API and gets interview questions
+ * @param {string} jobDescription - The job description to process
+ * @returns {Promise} - Response from Claude API with interview questions
+ */
+export const sendJobDescriptionForQuestions = async (jobDescription) => {
+  try {
+    console.log(
+      "Sending job description for questions, length:",
+      jobDescription.length
+    );
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
+
+    const API_BASE_URL = isLocalhost
+      ? "http://localhost:3000/api"
+      : "https://jobfit-backend-29ai.onrender.com/api";
+
+    const response = await fetch(`${API_BASE_URL}/generate-questions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ jobDescription }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed (${response.status}): ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error calling Claude API for questions:", error);
     throw error;
   }
 };

@@ -69,7 +69,7 @@ const Navbar = () => {
             to="/"
             className="text-green-800 dark:text-emerald-400 font-bold text-xl font-sans"
           >
-            JobFit
+            JobFitt.Ai
           </Link>
           <div className="flex items-center space-x-3">
             {/* Dark mode toggle - enhanced styling */}
@@ -148,7 +148,7 @@ const Navbar = () => {
                 onClick={handleNavClick}
                 className="block py-2 text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
               >
-                {["Home", "Why JobFit?", "Contact Us"][i]}
+                {["Home", "Why JobFitt.Ai?", "Contact Us"][i]}
               </Link>
             ))}
             {!isAuthenticated && (
@@ -179,7 +179,7 @@ const Navbar = () => {
         to="/"
         className="text-green-800 dark:text-emerald-400 font-bold text-2xl font-sans"
       >
-        JobFit
+        JobFitt.Ai
       </Link>
 
       <div className="flex items-center space-x-8">
@@ -189,7 +189,7 @@ const Navbar = () => {
             to={path}
             className="text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
           >
-            {["Home", "Why JobFit?", "Contact Us"][i]}
+            {["Home", "Why JobFitt.Ai?", "Contact Us"][i]}
           </Link>
         ))}
       </div>
