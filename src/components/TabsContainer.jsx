@@ -86,7 +86,9 @@ const TabsContainer = ({
             key={tab.id}
             className={`tab-button ${activeTab === tab.id ? "active" : ""}`}
             onClick={() => setActiveTab(tab.id)}
-          ></button>
+          >
+            {tab.label}
+          </button>
         ))}
       </div>
       <div className="tab-content-container">
