@@ -92,9 +92,6 @@ const TabsContainer = ({
         ))}
       </div>
       <div className="tab-content-container">
-        <h2 className="tab-title">
-          {tabs.find((tab) => tab.id === activeTab)?.label}
-        </h2>
         <div className="tab-content">{renderTabContent()}</div>
       </div>
     </div>
