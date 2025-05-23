@@ -24,7 +24,6 @@ function JobAnalysis({
   const [coverLetter, setCoverLetter] = useState("");
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
   const [activeDocument, setActiveDocument] = useState(null);
-
   useEffect(() => {
     if (!summary) return;
 
@@ -34,7 +33,35 @@ function JobAnalysis({
     const doc = iframe.contentDocument || iframe.contentWindow.document;
 
     doc.open();
-    doc.write(summary);
+
+    // Inject CSS styling along with the content
+    const styledContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body {
+          background-color: white !important;
+          color: black !important;
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          margin: 20px;
+          padding: 0;
+        }
+        * {
+          background-color: inherit !important;
+          color: inherit !important;
+        }
+      </style>
+    </head>
+    <body>
+      ${summary}
+    </body>
+    </html>
+  `;
+
+    doc.write(styledContent);
     doc.close();
 
     // Set active document to resume when summary is first generated
@@ -43,6 +70,7 @@ function JobAnalysis({
     }
   }, [summary, activeDocument]);
 
+  // Also update the cover letter useEffect:
   useEffect(() => {
     if (!coverLetter) return;
 
@@ -52,7 +80,35 @@ function JobAnalysis({
     const doc = iframe.contentDocument || iframe.contentWindow.document;
 
     doc.open();
-    doc.write(coverLetter);
+
+    // Inject CSS styling along with the content
+    const styledContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body {
+          background-color: white !important;
+          color: black !important;
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          margin: 20px;
+          padding: 0;
+        }
+        * {
+          background-color: inherit !important;
+          color: inherit !important;
+        }
+      </style>
+    </head>
+    <body>
+      ${coverLetter}
+    </body>
+    </html>
+  `;
+
+    doc.write(styledContent);
     doc.close();
 
     // Set active document to cover letter when it's first generated

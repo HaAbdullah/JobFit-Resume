@@ -125,6 +125,11 @@
   transition: color 0.3s;
 }
 
+/* Fix for dark mode textarea text color */
+.dark .text-input-box textarea {
+  color: #e0e0e0;
+}
+
 .clear-button {
   position: absolute;
   top: 8px;
