@@ -141,14 +141,14 @@ const Navbar = () => {
           }`}
         >
           <div className="px-4 py-3 space-y-2">
-            {["/", "/why", "/contact"].map((path, i) => (
+            {["/", "/how", "/why", "/contact"].map((path, i) => (
               <Link
                 key={path}
                 to={path}
                 onClick={handleNavClick}
                 className="block py-2 text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
               >
-                {["Home", "Why JobFitt.Ai?", "Contact Us"][i]}
+                {["Home", "How It Works?", "Why JobFitt.Ai?", "Contact Us"][i]}
               </Link>
             ))}
             {!isAuthenticated && (
@@ -183,13 +183,13 @@ const Navbar = () => {
       </Link>
 
       <div className="flex items-center space-x-8">
-        {["/", "/why", "/contact"].map((path, i) => (
+        {["/", "/how", "/why", "/contact"].map((path, i) => (
           <Link
             key={path}
             to={path}
             className="text-gray-800 dark:text-gray-100 hover:text-green-800 dark:hover:text-emerald-400 transition-colors"
           >
-            {["Home", "Why JobFitt.Ai?", "Contact Us"][i]}
+            {["Home", "How It Works?", "Why JobFitt.Ai?", "Contact Us"][i]}
           </Link>
         ))}
       </div>

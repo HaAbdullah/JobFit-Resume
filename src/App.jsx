@@ -48,7 +48,7 @@ function AppContent() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/why" element={<Why />} />
-        {/* <Route path="/how" element={<How />} /> */}
+        <Route path="/how" element={<How />} />
         <Route path="/contact" element={<Contact />} />
         <Route
           path="/account"

@@ -166,3 +166,41 @@ export const sendJobDescriptionForQuestions = async (jobDescription) => {
     throw error;
   }
 };
+
+/**
+ * Sends a job description to get compensation benchmarking data
+ * @param {string} jobDescription - The job description to process
+ * @returns {Promise} - Response with compensation data
+ */
+export const sendJobDescriptionForCompensation = async (jobDescription) => {
+  try {
+    console.log(
+      "Sending job description for compensation analysis, length:",
+      jobDescription.length
+    );
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
+
+    const API_BASE_URL = isLocalhost
+      ? "http://localhost:3000/api"
+      : "https://jobfit-backend-29ai.onrender.com/api";
+
+    const response = await fetch(`${API_BASE_URL}/generate-compensation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ jobDescription }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed (${response.status}): ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error calling API for compensation data:", error);
+    throw error;
+  }
+};

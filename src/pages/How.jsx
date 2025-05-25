@@ -1,40 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import HeroImage from "../assets/hero2.jpg";
+
 const How = () => {
   return (
-    <div className="bg-white dark:bg-gray-900 py-16 transition-colors">
+    <div className="bg-white dark:bg-gray-900 py-16 mt-32 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center">
-          {/* Left Content Area */}
-          <div className="md:w-1/2 relative mb-8 md:mb-0">
-            <div className="relative z-10 p-8 rounded-lg bg-white dark:bg-gray-800 transition-colors">
-              <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-green-600 via-green-700 to-green-800 bg-clip-text dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text mb-4 transition-colors">
-                One-Click Career Upgrade – ATS-Ready for Top Selection
-              </h1>
-
-              <p className="text-xl text-gray-900 dark:text-gray-200 transition-colors mb-6">
-                Submit your resume and dream job—JobFitt.ai builds your
-                ATS-optimized resume, cover letter, employer analysis, and
-                interview roadmap to clear automated screeners.
-              </p>
-              {/* 
-              <button className="bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 hover:bg-green-800 text-white font-medium py-2 px-8 rounded-md transition-colors">
-                Sign up today
-              </button> */}
-            </div>
-          </div>
-
-          {/* Right Image Area */}
-          <div className="md:w-1/2 nm">
-            <img
-              src={HeroImage}
-              alt="JobFitt.ai career optimization"
-              className="rounded-lg shadow-lg object-cover max-h-90 w-full"
-            />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-emerald-500/5 p-8 mb-8 mt-12 transition-colors">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-emerald-500/5 p-8 mb-8 transition-colors">
           <div className="mb-12">
             <div className="inline-block px-4 py-2 bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white rounded-full mb-4 transition-colors shadow-sm">
               Step 1
