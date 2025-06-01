@@ -69,8 +69,9 @@ const Navbar = () => {
             <img
               src="/logo.png"
               alt="JobFitt.Ai Logo"
-              className="w-8 h-8 object-contain"
+              className="w-10 h-10 object-contain" // was w-8 h-8
             />
+
             <span className="text-green-800 dark:text-emerald-400 font-bold text-xl font-sans">
               JobFitt.Ai
             </span>
@@ -183,8 +184,9 @@ const Navbar = () => {
         <img
           src="/logo.png"
           alt="JobFitt.Ai Logo"
-          className="w-10 h-10 object-contain"
+          className="w-12 h-12 object-contain" // was w-10 h-10
         />
+
         <span className="text-green-800 dark:text-emerald-400 font-bold text-2xl font-sans">
           JobFitt.Ai
         </span>
