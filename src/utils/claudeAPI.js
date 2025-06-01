@@ -204,3 +204,88 @@ export const sendJobDescriptionForCompensation = async (jobDescription) => {
     throw error;
   }
 };
+/**
+ * Sends a job description to get company insights data
+ * @param {string} jobDescription - The job description to process
+ * @returns {Promise} - Response with company insights data
+ */
+export const sendJobDescriptionForCompanyInsights = async (jobDescription) => {
+  try {
+    console.log(
+      "Sending job description for company insights analysis, length:",
+      jobDescription.length
+    );
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
+
+    const API_BASE_URL = isLocalhost
+      ? "http://localhost:3000/api"
+      : "https://jobfit-backend-29ai.onrender.com/api";
+
+    const response = await fetch(`${API_BASE_URL}/generate-company-insights`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ jobDescription }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed (${response.status}): ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error calling API for company insights data:", error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a job description and analysis results to get keywords analysis
+ * @param {string} jobDescription - The job description to process
+ * @param {object} analysisResults - The existing analysis results
+ * @returns {Promise} - Response with keywords analysis data
+ */
+export const sendJobDescriptionForKeywords = async (
+  jobDescription,
+  analysisResults
+) => {
+  try {
+    console.log(
+      "Sending job description for keywords analysis, JD length:",
+      jobDescription.length,
+      "Analysis results available:",
+      !!analysisResults
+    );
+
+    const isLocalhost =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
+
+    const API_BASE_URL = isLocalhost
+      ? "http://localhost:3000/api"
+      : "https://jobfit-backend-29ai.onrender.com/api";
+
+    const response = await fetch(`${API_BASE_URL}/generate-keywords`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jobDescription,
+        analysisResults,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed (${response.status}): ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error calling API for keywords analysis:", error);
+    throw error;
+  }
+};

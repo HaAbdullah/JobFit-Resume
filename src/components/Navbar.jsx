@@ -55,8 +55,8 @@ const Navbar = () => {
 
   // Enhanced base background styles for better dark mode appearance
   const baseBg = scrolled
-    ? "bg-white dark:bg-gray-900 bg-opacity-90 dark:bg-opacity-80 backdrop-blur-sm shadow-md rounded-full"
-    : "bg-white dark:bg-gray-900";
+    ? "bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 backdrop-blur-sm shadow-md rounded-full"
+    : "bg-white dark:bg-gray-800";
 
   // Mobile version
   if (isMobile) {
@@ -65,11 +65,15 @@ const Navbar = () => {
         <div
           className={`fixed top-0 left-0 right-0 w-full flex justify-between items-center px-4 py-4 ${baseBg} z-50 transition-all duration-300`}
         >
-          <Link
-            to="/"
-            className="text-green-800 dark:text-emerald-400 font-bold text-xl font-sans"
-          >
-            JobFitt.Ai
+          <Link to="/" className="flex items-center space-x-2">
+            <img
+              src="/logo.png"
+              alt="JobFitt.Ai Logo"
+              className="w-8 h-8 object-contain"
+            />
+            <span className="text-green-800 dark:text-emerald-400 font-bold text-xl font-sans">
+              JobFitt.Ai
+            </span>
           </Link>
           <div className="flex items-center space-x-3">
             {/* Dark mode toggle - enhanced styling */}
@@ -175,11 +179,15 @@ const Navbar = () => {
           : "absolute top-0 left-0 right-0 w-full"
       } ${baseBg}`}
     >
-      <Link
-        to="/"
-        className="text-green-800 dark:text-emerald-400 font-bold text-2xl font-sans"
-      >
-        JobFitt.Ai
+      <Link to="/" className="flex items-center space-x-3">
+        <img
+          src="/logo.png"
+          alt="JobFitt.Ai Logo"
+          className="w-10 h-10 object-contain"
+        />
+        <span className="text-green-800 dark:text-emerald-400 font-bold text-2xl font-sans">
+          JobFitt.Ai
+        </span>
       </Link>
 
       <div className="flex items-center space-x-8">

@@ -4,7 +4,7 @@ import HeroImage from "../assets/hero2.jpg";
 
 const How = () => {
   return (
-    <div className="bg-white dark:bg-gray-900 py-16 mt-32 transition-colors">
+    <div className="bg-white dark:bg-gray-900 py-16 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-emerald-500/5 p-8 mb-8 transition-colors">
           <div className="mb-12">
@@ -46,11 +46,11 @@ const How = () => {
               <p className="font-semibold text-gray-900 dark:text-gray-50 transition-colors">
                 What we extract:
               </p>
-              <ul className="list-disc ml-5 mt-2 text-gray-800 dark:text-gray-300 transition-colors">
-                <li>Key responsibilities and must-have skills</li>
-                <li>Keywords used by recruiters and ATS bots</li>
-                <li>Role-specific tone, industry jargon, and priorities</li>
-              </ul>
+              <div className="mt-2 text-gray-800 dark:text-gray-300 transition-colors">
+                <p>Key responsibilities and must-have skills</p>
+                <p>Keywords used by recruiters and ATS bots</p>
+                <p>Role-specific tone, industry jargon, and priorities</p>
+              </div>
             </div>
           </div>
 
@@ -111,11 +111,11 @@ const How = () => {
             <p className="text-lg mb-4 text-gray-800 dark:text-gray-300 transition-colors">
               In under 60 seconds, you'll receive:
             </p>
-            <ul className="list-disc ml-5 mb-4 text-gray-800 dark:text-gray-300 transition-colors">
-              <li>A tailored resume aligned with the job's expectations</li>
-              <li>A custom-written, well-formatted cover letter</li>
-              <li>Files ready to upload to job portals or send directly</li>
-            </ul>
+            <div className="mb-4 text-gray-800 dark:text-gray-300 transition-colors">
+              <p>A tailored resume aligned with the job's expectations</p>
+              <p>A custom-written, well-formatted cover letter</p>
+              <p>Files ready to upload to job portals or send directly</p>
+            </div>
             <div className="bg-green-50 dark:bg-emerald-900/20 border-l-4 border-green-700 dark:border-emerald-500 p-4 rounded transition-colors">
               <p className="font-semibold text-gray-900 dark:text-gray-50 transition-colors">
                 Want to edit or fine-tune?
@@ -130,7 +130,9 @@ const How = () => {
 
         <div className="text-center mt-8">
           <p className="text-2xl font-semibold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
-            Bottom line: 📈 JobFitt.ai helps you apply smarter — not harder.
+            From Resume to Interview — We’ve Got You Covered. Tailored resumes,
+            keyword-matched cover letters, culture insights, and company
+            research — all designed to pass ATS filters and land interviews.
           </p>
         </div>
       </div>

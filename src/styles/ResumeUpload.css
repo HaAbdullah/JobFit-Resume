@@ -488,3 +488,56 @@
     padding: 16px;
   }
 }
+/* Add this CSS to fix the mobile responsive issue */
+
+/* Make sure the mobile breakpoint has higher specificity */
+@media screen and (max-width: 768px) {
+  .upload-area-container {
+    flex-direction: column !important;
+    gap: 15px;
+    max-width: 100% !important;
+  }
+
+  .upload-box,
+  .text-input-box {
+    width: 100% !important;
+    flex: none !important;
+    max-width: 100% !important;
+    min-width: unset !important;
+  }
+
+  .text-input-box {
+    min-height: 150px;
+    resize: vertical; /* Only allow vertical resize on mobile */
+  }
+}
+
+/* For even smaller screens */
+@media screen and (max-width: 480px) {
+  .upload-area-container {
+    flex-direction: column !important;
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .upload-box,
+  .text-input-box {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .upload-box {
+    height: 180px;
+    padding: 15px;
+  }
+
+  .upload-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .text-input-box {
+    min-height: 120px;
+    resize: none; /* Disable resize on very small screens */
+  }
+}

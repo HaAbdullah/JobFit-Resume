@@ -8,7 +8,7 @@ body {
 
 /* Dark mode styles */
 .dark body {
-  background-color: #1e1e1e; /* Dark gray instead of pure black */
+  background-color: #111827; /* Dark gray instead of pure black */
   color: #f0f0f0;
 }
 
@@ -91,7 +91,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  border-bottom: 3px solid #e85f88; /* thinner underline */
+  border-bottom: 3px solid #4e6aff; /* thinner underline */
 }
 
 /* Description text */
