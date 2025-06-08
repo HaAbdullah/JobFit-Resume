@@ -1,148 +1,110 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/ChatInterface.css";
-import sendIcon from "../assets/send.svg"; // You'll need to add this to your assets
+import sendIcon from "../assets/send.svg";
 
 function ChatInterface({
-  resume,
-  jobDescriptionInput,
-  isGenerating,
-  onUpdateResume,
-  onUpdateCoverLetter,
-  activeDocument,
+  onSendMessage,
+  isLoading,
+  currentDocumentType,
+  onUpdateDocument,
+  currentDocument,
 }) {
-  const [messages, setMessages] = useState([]);
-  const [userInput, setUserInput] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [message, setMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const chatContainerRef = useRef(null);
 
-  // Scroll to bottom whenever messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    // Add initial system message when chat opens
+    setChatHistory([
+      {
+        role: "system",
+        content: `Your ${currentDocumentType} has been generated! How would you like to improve it?`,
+      },
+    ]);
+  }, [currentDocumentType]);
 
-  // Add initial system message when component mounts
   useEffect(() => {
-    if (messages.length === 0 && activeDocument) {
-      setMessages([
-        {
-          id: Date.now(),
-          sender: "system",
-          text:
-            activeDocument === "resume"
-              ? "How would you like to improve your resume? Ask me anything about tailoring your resume to this job."
-              : "How would you like to improve your cover letter? Ask me anything about enhancing your cover letter.",
-        },
-      ]);
+    // Scroll to bottom when chat history updates
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
-  }, [messages.length, activeDocument]);
+  }, [chatHistory]);
 
   const handleSendMessage = async () => {
-    if (!userInput.trim() || isSending) return;
+    if (!message.trim() || isChatLoading) return;
 
-    // Add user message to chat
-    const userMessage = {
-      id: Date.now(),
-      sender: "user",
-      text: userInput,
-    };
+    const userMessage = message.trim();
+    setMessage("");
 
-    setMessages((prev) => [...prev, userMessage]);
-    setUserInput("");
-    setIsSending(true);
+    // Update chat history with user message
+    const updatedHistory = [
+      ...chatHistory,
+      { role: "user", content: userMessage },
+    ];
+    setChatHistory(updatedHistory);
+
+    // Set loading state
+    setIsChatLoading(true);
 
     try {
-      // Create prompt based on which document we're modifying
-      const documentType =
-        activeDocument === "resume" ? "resume" : "cover letter";
-
-      // Prepare the prompt that will be sent to Claude
-      const prompt = `
-TASK: Modify the ${documentType} based on the user's request
-
-RESUME
-${resume}
-
-JOB DESCRIPTION
-${jobDescriptionInput}
-
-CURRENT ${documentType.toUpperCase()}
-${
-  activeDocument === "resume"
-    ? document.getElementById("summary-preview").contentDocument.documentElement
-        .outerHTML
-    : document.getElementById("cover-letter-preview").contentDocument
-        .documentElement.outerHTML
-}
-
-USER REQUEST
-${userInput}
-
-Please provide a complete updated HTML version of the ${documentType} with all the requested changes implemented.
-`;
-
-      // Determine which API endpoint to use
-      const endpoint =
-        activeDocument === "resume" ? "create-resume" : "create-cover-letter";
-
-      // For debugging
-      console.log(
-        `Sending ${documentType} modification request, length:`,
-        prompt.length
-      );
-
-      // Call the API
-      const isLocalhost = window.location.hostname === "localhost";
-      const API_BASE_URL = isLocalhost
-        ? "http://localhost:3000/api"
-        : "https://jobfit-backend-29ai.onrender.com/api";
-
-      const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // Add a loading message
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          role: "system",
+          content: "Processing your feedback...",
+          isLoading: true,
         },
-        body: JSON.stringify({
-          jobDescription: prompt,
-        }),
+      ]);
+
+      // Create the prompt with the current document and user feedback
+      const feedbackPrompt = `
+USER FEEDBACK:
+${userMessage}
+
+CURRENT ${currentDocumentType.toUpperCase()}:
+${currentDocument}
+      `;
+
+      // Send message for processing
+      const updatedDocument = await onSendMessage(feedbackPrompt);
+
+      // Remove loading message and add response
+      setChatHistory((prev) => {
+        const history = prev.filter((msg) => !msg.isLoading);
+        return [
+          ...history,
+          {
+            role: "system",
+            content: "Your feedback has been applied to the document!",
+          },
+        ];
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `API request failed (${response.status}): ${errorText}`
-        );
-      }
-
-      const data = await response.json();
-
-      // Add assistant response to chat
-      const assistantMessage = {
-        id: Date.now() + 1,
-        sender: "assistant",
-        text: `I've updated your ${documentType} as requested. The changes have been applied to the preview above.`,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      // Update the appropriate document with the new content
-      if (activeDocument === "resume") {
-        onUpdateResume(data.content[0].text);
-      } else {
-        onUpdateCoverLetter(data.content[0].text);
+      // Trigger document update in parent component with the updated HTML
+      if (onUpdateDocument && updatedDocument) {
+        onUpdateDocument(updatedDocument);
       }
     } catch (error) {
-      console.error("Error updating document:", error);
+      console.error("Error processing message:", error);
 
-      // Add error message to chat
-      const errorMessage = {
-        id: Date.now() + 1,
-        sender: "assistant",
-        text: `I'm sorry, there was an error processing your request: ${error.message}`,
-      };
-
-      setMessages((prev) => [...prev, errorMessage]);
+      // Remove loading message and add error message
+      setChatHistory((prev) => {
+        const history = prev.filter((msg) => !msg.isLoading);
+        return [
+          ...history,
+          {
+            role: "system",
+            content:
+              "Sorry, there was an error processing your feedback. Please try again.",
+            error: true,
+          },
+        ];
+      });
     } finally {
-      setIsSending(false);
+      setIsChatLoading(false);
     }
   };
 
@@ -153,56 +115,111 @@ Please provide a complete updated HTML version of the ${documentType} with all t
     }
   };
 
-  if (!activeDocument) return null;
+  // Suggested feedback options
+  const suggestedFeedback = [
+    {
+      type: "resume",
+      suggestions: [
+        "Make it more concise",
+        "Emphasize my leadership skills",
+        "Highlight my technical expertise",
+        "Better align with the job requirements",
+      ],
+    },
+    {
+      type: "cover letter",
+      suggestions: [
+        "Make it more personalized",
+        "Highlight my passion for the industry",
+        "Address why I'm a good cultural fit",
+        "Make it more concise",
+      ],
+    },
+  ];
+
+  // Get suggestions based on current document type
+  const currentSuggestions =
+    suggestedFeedback.find((item) => item.type === currentDocumentType)
+      ?.suggestions || [];
 
   return (
     <div className="chat-interface">
       <div className="chat-header">
-        <h3>Chat With AI Assistant</h3>
-        <p className="chat-subtitle">
-          Ask questions or request changes to your {activeDocument}
-        </p>
+        <h3>
+          Improve Your{" "}
+          {currentDocumentType.charAt(0).toUpperCase() +
+            currentDocumentType.slice(1)}
+        </h3>
       </div>
 
-      <div className="chat-messages">
-        {messages.map((message) => (
+      <div className="chat-container" ref={chatContainerRef}>
+        {chatHistory.map((msg, index) => (
           <div
-            key={message.id}
-            className={`message ${
-              message.sender === "user" ? "user-message" : "assistant-message"
+            key={index}
+            className={`chat-message ${
+              msg.role === "user" ? "user-message" : "system-message"
+            } ${msg.isLoading ? "loading-message" : ""} ${
+              msg.error ? "error-message" : ""
             }`}
           >
-            <div className="message-bubble">{message.text}</div>
+            <div className="message-content">
+              {msg.isLoading ? (
+                <>
+                  <div className="mini-spinner"></div>
+                  <span>{msg.content}</span>
+                </>
+              ) : (
+                msg.content
+              )}
+            </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input-container">
+      {currentSuggestions.length > 0 && (
+        <div className="suggestion-chips">
+          {currentSuggestions.map((suggestion, index) => (
+            <button
+              key={index}
+              className="suggestion-chip"
+              onClick={() => {
+                setMessage(suggestion);
+                // Focus on the textarea after selecting a suggestion
+                setTimeout(() => {
+                  const textarea = document.querySelector(
+                    ".chat-input textarea"
+                  );
+                  if (textarea) {
+                    textarea.focus();
+                  }
+                }, 0);
+              }}
+              disabled={isChatLoading || isLoading}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="chat-input">
         <textarea
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message here..."
-          disabled={isSending || isGenerating}
-          rows={1}
-          className="chat-input"
+          placeholder={`How would you like to improve your ${currentDocumentType}?`}
+          disabled={isChatLoading || isLoading}
+          rows={2}
         />
         <button
           onClick={handleSendMessage}
-          disabled={!userInput.trim() || isSending || isGenerating}
+          disabled={!message.trim() || isChatLoading || isLoading}
           className="send-button"
+          aria-label="Send message"
         >
           <img src={sendIcon} alt="Send" />
         </button>
       </div>
-
-      {isSending && (
-        <div className="chat-loading">
-          <div className="chat-spinner"></div>
-          <p>Updating...</p>
-        </div>
-      )}
     </div>
   );
 }

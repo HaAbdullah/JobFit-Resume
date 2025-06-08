@@ -69,9 +69,8 @@ const Navbar = () => {
             <img
               src="/logo.png"
               alt="JobFitt.Ai Logo"
-              className="w-10 h-10 object-contain" // was w-8 h-8
+              className="w-10 h-10 object-contain"
             />
-
             <span className="text-green-800 dark:text-emerald-400 font-bold text-xl font-sans">
               JobFitt.Ai
             </span>
@@ -184,9 +183,8 @@ const Navbar = () => {
         <img
           src="/logo.png"
           alt="JobFitt.Ai Logo"
-          className="w-12 h-12 object-contain" // was w-10 h-10
+          className="w-12 h-12 object-contain"
         />
-
         <span className="text-green-800 dark:text-emerald-400 font-bold text-2xl font-sans">
           JobFitt.Ai
         </span>
@@ -205,6 +203,13 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center space-x-4">
+        {/* Pricing button - always visible with same styling as Sign Up */}
+        <Link
+          to="/pricing"
+          className="bg-green-700 dark:bg-emerald-600 text-white font-semibold px-6 py-2 rounded-full hover:bg-opacity-90 transition-colors shadow-sm dark:shadow-emerald-500/20"
+        >
+          Pricing
+        </Link>
         {/* Dark mode toggle - enhanced */}
         <button
           onClick={toggleDarkMode}
