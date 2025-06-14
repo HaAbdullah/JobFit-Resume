@@ -14,6 +14,8 @@ import Contact from "./pages/Contact";
 import Pricing from "./pages/Pricing";
 import Navbar from "./components/Navbar";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { UsageProvider } from "./context/UsageContext";
+
 import "./App.css";
 
 // Initialize Firebase (make sure this is imported at the top level)
@@ -70,7 +72,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <UsageProvider>
+          <AppContent />
+        </UsageProvider>
       </AuthProvider>
     </Router>
   );

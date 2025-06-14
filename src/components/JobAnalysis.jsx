@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { sendJobDescriptionToClaude } from "../utils/claudeAPI";
+import {
+  sendJobDescriptionToClaude,
+  sendChatFeedbackToClaude,
+} from "../utils/claudeAPI"; // Import your Claude API function
+import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import downloadIcon from "../assets/download.png";
 import rotateIcon from "../assets/rotate.png";
 import "../styles/JobAnalysis.css";
 import ChatInterface from "./ChatInterface";
+import { useUsage } from "../context/UsageContext";
+import UsageDisplay from "./UsageDisplay";
+import UpgradeModal from "./UpgradeModal";
 
 function JobAnalysis({
   resume,
@@ -16,6 +24,10 @@ function JobAnalysis({
   analysisResults,
   setAnalysisResults,
 }) {
+  const { currentUser } = useAuth();
+  const isAuthenticated = !!currentUser;
+  const { canGenerate, incrementUsage, setShowUpgradeModal } = useUsage();
+
   const [isLoading, setIsLoading] = useState(false);
   const [jobDescriptionInput, setJobDescriptionInput] = useState("");
   const [finalClaudePrompt, setFinalClaudePrompt] = useState("");
@@ -24,6 +36,20 @@ function JobAnalysis({
   const [coverLetter, setCoverLetter] = useState("");
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
   const [activeDocument, setActiveDocument] = useState(null);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+
+  // ADD THIS: Handler for chat feedback
+  const handleSendMessage = async (feedbackPrompt) => {
+    try {
+      const response = await sendChatFeedbackToClaude(feedbackPrompt);
+      // Return the updated document content
+      return response.content[0].text;
+    } catch (error) {
+      console.error("Error sending chat feedback:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     if (!summary) return;
 
@@ -116,6 +142,12 @@ function JobAnalysis({
   }, [coverLetter]);
 
   const handleSendJobDescription = async () => {
+    // For authenticated users, check usage limits
+    if (isAuthenticated && !canGenerate()) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     if (!jobDescriptionInput.trim()) return;
     setIsLoading(true);
     setError("");
@@ -129,13 +161,20 @@ function JobAnalysis({
 
     try {
       const response = await sendJobDescriptionToClaude(createdPrompt);
+
+      // Always set the summary (allow generation for both authenticated and non-authenticated users)
       setSummary(response.content[0].text);
 
-      // Update the parent component's state - this is critical!
+      // Update the parent component's state
       setJobDescription(jobDescriptionInput);
       setIsJobDescriptionSubmitted(true);
       if (setAnalysisResults) {
         setAnalysisResults(response.content[0].text);
+      }
+
+      // Only increment usage for authenticated users
+      if (isAuthenticated) {
+        incrementUsage();
       }
     } catch (err) {
       setError(err.message);
@@ -144,22 +183,35 @@ function JobAnalysis({
     }
   };
 
+  // Update your handleGenerateCoverLetter function:
   const handleGenerateCoverLetter = async () => {
     if (!jobDescriptionInput.trim() || !resume.trim()) return;
+
+    // For authenticated users, check usage limits
+    if (isAuthenticated && !canGenerate()) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setGeneratingCoverLetter(true);
     setError("");
 
     try {
-      // Create the prompt with instructions for cover letter
       let coverLetterPrompt =
         "TASK: Generate a professional cover letter\n\nRESUME\n" +
         resume +
         "\nJOB DESCRIPTION\n" +
         jobDescriptionInput;
 
-      // Send to the new API endpoint
       const response = await sendCoverLetterToClaude(coverLetterPrompt);
+
+      // Always set the cover letter (allow generation for both authenticated and non-authenticated users)
       setCoverLetter(response.content[0].text);
+
+      // Only increment usage for authenticated users
+      if (isAuthenticated) {
+        incrementUsage();
+      }
     } catch (err) {
       setError("Cover letter generation error: " + err.message);
     } finally {
@@ -206,6 +258,11 @@ function JobAnalysis({
   };
 
   const downloadPDF = (content, type) => {
+    if (!isAuthenticated) {
+      setShowAuthPrompt(true);
+      return;
+    }
+
     if (!content) return;
 
     try {
@@ -263,6 +320,7 @@ function JobAnalysis({
 
   return (
     <div className="job-analysis-container">
+      {isAuthenticated && <UsageDisplay />}
       <div className="message-input">
         <h2 className="upload-title">
           Add the job posting. We'll analyze what the company is really looking
@@ -309,6 +367,40 @@ function JobAnalysis({
       )}
 
       {error && <div className="error-message">Error: {error}</div>}
+
+      {/* Auth Prompt Modal */}
+      {showAuthPrompt && !isAuthenticated && (
+        <div className="auth-prompt-overlay">
+          <div className="auth-prompt-modal">
+            <h3>🎉 Your documents are ready!</h3>
+            <p>
+              Sign up now to download your tailored resume and cover letter.
+            </p>
+            <div className="auth-prompt-features">
+              <p>
+                ✅ <strong>Free Freemium Account</strong>
+              </p>
+              <p>✅ No payment details required</p>
+              <p>✅ 2 resume + cover letter generations per month</p>
+              <p>✅ Basic ATS analysis included</p>
+            </div>
+            <div className="auth-prompt-buttons">
+              <Link to="/signup" className="auth-signup-btn">
+                Sign Up Free - No Payment Required
+              </Link>
+              <Link to="/login" className="auth-login-btn">
+                Already have an account? Log In
+              </Link>
+            </div>
+            <button
+              className="auth-close-btn"
+              onClick={() => setShowAuthPrompt(false)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {summary && (
         <div>
@@ -360,7 +452,7 @@ function JobAnalysis({
               className="download-button"
             >
               <img src={downloadIcon} alt="Download" />
-              Download as PDF
+              {isAuthenticated ? "Download as PDF" : "Download as PDF"}
             </button>
           </div>
         </div>
@@ -393,7 +485,7 @@ function JobAnalysis({
               className="download-button"
             >
               <img src={downloadIcon} alt="Download" />
-              Download as PDF
+              {isAuthenticated ? "Download as PDF" : "Download as PDF"}
             </button>
           </div>
         </div>
@@ -402,14 +494,26 @@ function JobAnalysis({
       {/* Chat Interface - Only visible when a document has been generated */}
       {activeDocument && (
         <ChatInterface
+          onSendMessage={handleSendMessage}
+          isLoading={isLoading || generatingCoverLetter}
           resume={resume}
           jobDescriptionInput={jobDescriptionInput}
           isGenerating={isLoading || generatingCoverLetter}
           onUpdateResume={handleUpdateResume}
           onUpdateCoverLetter={handleUpdateCoverLetter}
           activeDocument={activeDocument}
+          currentDocumentType={
+            activeDocument === "resume" ? "resume" : "cover letter"
+          }
+          currentDocument={activeDocument === "resume" ? summary : coverLetter}
+          onUpdateDocument={
+            activeDocument === "resume"
+              ? handleUpdateResume
+              : handleUpdateCoverLetter
+          }
         />
       )}
+      <UpgradeModal />
     </div>
   );
 }
