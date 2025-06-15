@@ -1,15 +1,86 @@
 import { useState } from "react";
 import { Check, X, Star, Zap, Crown, Infinity } from "lucide-react";
-
+import { loadStripe } from "@stripe/stripe-js";
+import { useAuth } from "../context/AuthContext";
 const PricingPage = () => {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [darkMode, setDarkMode] = useState(true);
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+  const { currentUser, signInWithGoogle } = useAuth();
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark", !darkMode);
+  const handleCheckout = async (planName, billingCycle) => {
+    try {
+      // Check if user is authenticated
+      if (!currentUser) {
+        // Redirect to login or show login modal
+        await signInWithGoogle();
+        return;
+      }
+
+      // Define your Stripe price IDs - replace with your actual price IDs from Stripe Dashboard
+      // const priceIds = {
+      //   Basic: {
+      //     monthly: "price_1Ra3hoA3sCBSHclDk3KSaLKL",
+      //     yearly: "price_1Ra3jcA3sCBSHclDkdvW5kTr",
+      //   },
+      //   Premium: {
+      //     monthly: "price_1Ra3kSA3sCBSHclDb9rjoG2u",
+      //     yearly: "price_1Ra3knA3sCBSHclDCbKmoiq7",
+      //   },
+      //   "Premium+": {
+      //     monthly: "price_1Ra3l9A3sCBSHclDYBaoP7Gz",
+      //     yearly: "price_1Ra3lPA3sCBSHclDivXblqCh",
+      //   },
+      // };
+      const priceIds = {
+        Basic: {
+          monthly: "price_1Ra3pUA3sCBSHclD2iDiFeOK",
+          yearly: "none",
+        },
+        Premium: {
+          monthly: "price_1Ra3phA3sCBSHclDcgaWJ9cz",
+          yearly: "none",
+        },
+        "Premium+": {
+          monthly: "price_1Ra3pxA3sCBSHclD99cjEjee",
+          yearly: "none",
+        },
+      };
+
+      const priceId = priceIds[planName][billingCycle];
+
+      if (!priceId) {
+        console.error("Price ID not found for:", planName, billingCycle);
+        return;
+      }
+
+      // Call your backend to create checkout session
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            priceId: priceId,
+            planName: planName,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+          }),
+        }
+      );
+
+      const { sessionId, url } = await response.json();
+
+      if (url) {
+        // Redirect to Stripe Checkout
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+    }
   };
-
   const plans = [
     {
       name: "Freemium",
@@ -334,7 +405,6 @@ const PricingPage = () => {
                       )}
                     </div>
                   </div>
-
                   {/* Features */}
                   <div className="space-y-3 mb-6">
                     {plan.features.map((feature, featureIndex) => (
@@ -368,13 +438,29 @@ const PricingPage = () => {
                       </div>
                     ))}
                   </div>
-
                   {/* CTA Button */}
+
                   <button
+                    onClick={() => {
+                      if (plan.name === "Freemium") {
+                        // Handle free plan signup - redirect to registration or dashboard
+                        if (!currentUser) {
+                          signInWithGoogle();
+                        } else {
+                          // User is already signed in, redirect to dashboard
+                          window.location.href = "/dashboard";
+                        }
+                      } else {
+                        // Handle paid plan checkout
+                        handleCheckout(plan.name, billingCycle);
+                      }
+                    }}
                     className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${plan.buttonStyle} transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-emerald-400`}
                   >
                     {plan.name === "Freemium"
-                      ? "Get Started Free"
+                      ? currentUser
+                        ? "Go to Dashboard"
+                        : "Get Started Free"
                       : "Start Free Trial"}
                   </button>
                 </div>
