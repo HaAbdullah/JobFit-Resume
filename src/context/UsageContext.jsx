@@ -1,7 +1,7 @@
 // context/UsageContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate } from "react-router-dom";
 
 const UsageContext = createContext();
 
@@ -22,10 +22,11 @@ const TIERS = {
 
 export const UsageProvider = ({ children }) => {
   const { currentUser } = useAuth();
-  const navigate = useNavigate(); // Add this
+  const navigate = useNavigate();
   const [userTier, setUserTier] = useState("FREEMIUM");
   const [usageCount, setUsageCount] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Fixed: Added missing isLoading state
 
   // Load user data on auth change
   useEffect(() => {
@@ -74,12 +75,10 @@ export const UsageProvider = ({ children }) => {
     setShowUpgradeModal(false);
   };
 
-  // Add this new function for direct navigation to pricing
   const goToPricing = () => {
     navigate("/pricing");
   };
 
-  // Add this function for handling upgrade modal actions
   const handleUpgradeFromModal = () => {
     setShowUpgradeModal(false);
     navigate("/pricing");
@@ -100,6 +99,101 @@ export const UsageProvider = ({ children }) => {
     }
   };
 
+  // Fixed: Improved cancellation function with better error handling
+  const cancelSubscription = async () => {
+    if (!currentUser) {
+      throw new Error("User not authenticated");
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Get stored customer/subscription info
+      const customerId = localStorage.getItem(
+        `stripe_customer_${currentUser.uid}`
+      );
+      const subscriptionId = localStorage.getItem(
+        `stripe_subscription_${currentUser.uid}`
+      );
+
+      if (!customerId && !subscriptionId) {
+        throw new Error("No subscription information found");
+      }
+
+      console.log("Cancelling subscription:", { customerId, subscriptionId });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/cancel-subscription`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerId,
+            subscriptionId,
+            userId: currentUser.uid, // Added userId for consistency
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to cancel subscription");
+      }
+
+      const result = await response.json();
+      console.log("Subscription cancelled:", result);
+
+      // Update user tier to FREEMIUM
+      setUserTier("FREEMIUM");
+      saveToStorage("FREEMIUM", usageCount);
+
+      // Clear stored Stripe info
+      localStorage.removeItem(`stripe_customer_${currentUser.uid}`);
+      localStorage.removeItem(`stripe_subscription_${currentUser.uid}`);
+
+      return result;
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check if user has active subscription
+  const hasActiveSubscription = () => {
+    if (!currentUser) return false;
+
+    const customerId = localStorage.getItem(
+      `stripe_customer_${currentUser.uid}`
+    );
+    const subscriptionId = localStorage.getItem(
+      `stripe_subscription_${currentUser.uid}`
+    );
+
+    return !!(customerId || subscriptionId) && userTier !== "FREEMIUM";
+  };
+
+  // Fixed: Added function to get subscription data from localStorage
+  const getSubscriptionData = () => {
+    if (!currentUser) return null;
+
+    const customerId = localStorage.getItem(
+      `stripe_customer_${currentUser.uid}`
+    );
+    const subscriptionId = localStorage.getItem(
+      `stripe_subscription_${currentUser.uid}`
+    );
+
+    return {
+      customerId,
+      subscriptionId,
+      hasSubscription: !!(customerId || subscriptionId),
+    };
+  };
+
   return (
     <UsageContext.Provider
       value={{
@@ -114,8 +208,12 @@ export const UsageProvider = ({ children }) => {
         setShowUpgradeModal,
         resetUsage,
         TIERS,
-        goToPricing, // Add this
-        handleUpgradeFromModal, // Add this
+        goToPricing,
+        handleUpgradeFromModal,
+        cancelSubscription,
+        hasActiveSubscription,
+        getSubscriptionData, // Added this helper
+        isLoading,
       }}
     >
       {children}

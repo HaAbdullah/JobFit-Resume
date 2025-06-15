@@ -60,7 +60,6 @@ const Success = () => {
       updateUserTier(sessionData.planName);
     }
   }, [currentUser, sessionData, tierUpdated]);
-
   const verifySession = async (sessionId) => {
     console.log("Verifying session:", sessionId);
 
@@ -79,37 +78,55 @@ const Success = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Session verification successful:", data);
+        console.log("Full response data:", JSON.stringify(data, null, 2)); // Add this line
+
         setSessionData(data);
 
-        // Update the user's tier based on the plan they purchased
+        // Remove the immediate storage code - let the useEffect handle it
+        // The useEffect above will handle storage when currentUser is available
+
+        // Update the user's tier
         if (data.planName && currentUser && !tierUpdated) {
           console.log("Updating tier immediately with session data...");
           await updateUserTier(data.planName);
         }
       } else {
         console.error("Session verification failed:", response.status);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
         throw new Error("Session verification failed");
       }
     } catch (error) {
       console.error("Error verifying session:", error);
-
-      // Even if verification fails, try to get plan info from URL or sessionStorage
-      const urlParams = new URLSearchParams(window.location.search);
-      const planFromUrl = urlParams.get("plan");
-      const planFromStorage = sessionStorage.getItem("selectedPlan");
-
-      console.log("Fallback - Plan from URL:", planFromUrl);
-      console.log("Fallback - Plan from storage:", planFromStorage);
-
-      if (planFromUrl || planFromStorage) {
-        console.log("Using fallback plan info...");
-        await updateUserTier(planFromUrl || planFromStorage);
-      }
     } finally {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    if (currentUser && sessionData) {
+      console.log("User now available, storing subscription data...");
 
+      // Store customer ID if available
+      if (sessionData.customer_id) {
+        localStorage.setItem(
+          `stripe_customer_${currentUser.uid}`,
+          sessionData.customer_id
+        );
+        console.log("✅ Stored customer ID:", sessionData.customer_id);
+      }
+
+      // Store subscription ID if available
+      if (sessionData.subscription_id) {
+        localStorage.setItem(
+          `stripe_subscription_${currentUser.uid}`,
+          sessionData.subscription_id
+        );
+        console.log("✅ Stored subscription ID:", sessionData.subscription_id);
+      } else {
+        console.warn("⚠️ No subscription_id in session data");
+      }
+    }
+  }, [currentUser, sessionData]);
   // Updated function to update the user's tier
   const updateUserTier = async (planName) => {
     console.log("updateUserTier called with:", planName);

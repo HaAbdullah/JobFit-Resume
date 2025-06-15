@@ -14,6 +14,7 @@ import Contact from "./pages/Contact";
 import Pricing from "./pages/Pricing";
 import Success from "./pages/Success";
 import Navbar from "./components/Navbar";
+import Dashboard from "./pages/Dashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { UsageProvider } from "./context/UsageContext";
 
@@ -54,6 +55,7 @@ function AppContent() {
         <Route path="/why" element={<Why />} />
         <Route path="/how" element={<How />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/success" element={<Success />} />
         <Route
