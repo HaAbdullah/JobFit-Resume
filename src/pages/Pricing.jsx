@@ -8,6 +8,8 @@ const PricingPage = () => {
   const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
   const { currentUser, signInWithGoogle } = useAuth();
 
+  // Add this enhancement to your handleCheckout function in PricingPage.js
+
   const handleCheckout = async (planName, billingCycle) => {
     try {
       // Check if user is authenticated
@@ -17,6 +19,9 @@ const PricingPage = () => {
         return;
       }
 
+      // Store the selected plan in sessionStorage for fallback
+      sessionStorage.setItem("selectedPlan", planName);
+      sessionStorage.setItem("selectedBillingCycle", billingCycle);
       // Define your Stripe price IDs - replace with your actual price IDs from Stripe Dashboard
       // const priceIds = {
       //   Basic: {
@@ -79,8 +84,12 @@ const PricingPage = () => {
       }
     } catch (error) {
       console.error("Checkout error:", error);
+      // Clear stored plan data on error
+      sessionStorage.removeItem("selectedPlan");
+      sessionStorage.removeItem("selectedBillingCycle");
     }
   };
+
   const plans = [
     {
       name: "Freemium",

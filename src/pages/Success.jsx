@@ -1,27 +1,69 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, ArrowRight, Download, Star } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useUsage } from "../context/UsageContext";
 
 const Success = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [sessionData, setSessionData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tierUpdated, setTierUpdated] = useState(false);
   const { currentUser } = useAuth();
+  const { upgradeTier } = useUsage();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Success page loaded");
+    console.log("Current user:", currentUser);
+    console.log("Tier updated:", tierUpdated);
+  }, [currentUser, tierUpdated]);
 
   useEffect(() => {
-    // Get session_id from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get("session_id");
+    const initializeSuccess = async () => {
+      console.log("Initializing success page...");
 
-    if (sessionId) {
-      // Optional: Verify the session with your backend
-      verifySession(sessionId);
-    } else {
-      setLoading(false);
+      // Get session_id from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get("session_id");
+      const planFromUrl = urlParams.get("plan");
+
+      console.log("Session ID from URL:", sessionId);
+      console.log("Plan from URL:", planFromUrl);
+
+      if (sessionId) {
+        await verifySession(sessionId);
+      } else {
+        console.log("No session ID found, checking for plan info...");
+
+        // Try to get plan info from URL or sessionStorage
+        const planFromStorage = sessionStorage.getItem("selectedPlan");
+        console.log("Plan from storage:", planFromStorage);
+
+        if (planFromUrl || planFromStorage) {
+          console.log("Found plan info, updating tier...");
+          await updateUserTier(planFromUrl || planFromStorage);
+        } else {
+          console.log("No plan information found");
+        }
+
+        setLoading(false);
+      }
+    };
+
+    initializeSuccess();
+  }, []); // Remove currentUser from deps to avoid infinite loops
+
+  // Separate effect to handle tier updates when user becomes available
+  useEffect(() => {
+    if (currentUser && sessionData?.planName && !tierUpdated) {
+      console.log("User available, updating tier with session data...");
+      updateUserTier(sessionData.planName);
     }
-  }, []);
+  }, [currentUser, sessionData, tierUpdated]);
 
   const verifySession = async (sessionId) => {
+    console.log("Verifying session:", sessionId);
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/verify-session`,
@@ -36,12 +78,83 @@ const Success = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Session verification successful:", data);
         setSessionData(data);
+
+        // Update the user's tier based on the plan they purchased
+        if (data.planName && currentUser && !tierUpdated) {
+          console.log("Updating tier immediately with session data...");
+          await updateUserTier(data.planName);
+        }
+      } else {
+        console.error("Session verification failed:", response.status);
+        throw new Error("Session verification failed");
       }
     } catch (error) {
       console.error("Error verifying session:", error);
+
+      // Even if verification fails, try to get plan info from URL or sessionStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const planFromUrl = urlParams.get("plan");
+      const planFromStorage = sessionStorage.getItem("selectedPlan");
+
+      console.log("Fallback - Plan from URL:", planFromUrl);
+      console.log("Fallback - Plan from storage:", planFromStorage);
+
+      if (planFromUrl || planFromStorage) {
+        console.log("Using fallback plan info...");
+        await updateUserTier(planFromUrl || planFromStorage);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Updated function to update the user's tier
+  const updateUserTier = async (planName) => {
+    console.log("updateUserTier called with:", planName);
+    console.log("Current user:", currentUser);
+    console.log("Tier already updated:", tierUpdated);
+
+    if (!currentUser) {
+      console.log("No current user available, cannot update tier");
+      return;
+    }
+
+    if (tierUpdated) {
+      console.log("Tier already updated, skipping");
+      return;
+    }
+
+    // Map plan names to tier constants
+    const planToTier = {
+      Basic: "BASIC",
+      Premium: "PREMIUM",
+      "Premium+": "PREMIUM_PLUS",
+    };
+
+    const tierKey = planToTier[planName];
+    console.log("Mapped tier key:", tierKey);
+
+    if (tierKey) {
+      try {
+        console.log(`Upgrading user ${currentUser.uid} to ${tierKey} tier`);
+
+        // Call the upgradeTier function
+        await upgradeTier(tierKey);
+
+        setTierUpdated(true);
+
+        // Clear any stored plan selection
+        sessionStorage.removeItem("selectedPlan");
+
+        console.log("Tier updated successfully!");
+      } catch (error) {
+        console.error("Error updating tier:", error);
+      }
+    } else {
+      console.warn("Unknown plan name:", planName);
+      console.log("Available plan mappings:", Object.keys(planToTier));
     }
   };
 
@@ -92,6 +205,41 @@ const Success = () => {
               ! Your subscription is now active and you're ready to accelerate
               your job search.
             </p>
+
+            {/* Debug Info (remove in production) */}
+            {/* {process.env.NODE_ENV === "development" && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-6 border border-yellow-200 dark:border-yellow-800 text-left">
+                <h4 className="font-bold text-yellow-800 dark:text-yellow-300 mb-2">
+                  Debug Info:
+                </h4>
+                <pre className="text-xs text-yellow-700 dark:text-yellow-400">
+                  {JSON.stringify(
+                    {
+                      currentUser: currentUser
+                        ? { uid: currentUser.uid }
+                        : null,
+                      sessionData,
+                      tierUpdated,
+                      urlParams: Object.fromEntries(
+                        new URLSearchParams(window.location.search)
+                      ),
+                    },
+                    null,
+                    2
+                  )}
+                </pre>
+              </div>
+            )} */}
+
+            {/* Tier Update Confirmation */}
+            {tierUpdated && (
+              <div className="bg-green-50 dark:bg-emerald-900/20 rounded-lg p-4 mb-6 border border-green-200 dark:border-emerald-800">
+                <p className="text-green-700 dark:text-emerald-400 font-medium">
+                  ✨ Your account has been upgraded to{" "}
+                  {sessionData?.planName || "Premium"} tier!
+                </p>
+              </div>
+            )}
 
             {/* Plan Details Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
