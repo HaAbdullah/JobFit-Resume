@@ -101,7 +101,7 @@ const How = () => {
             </div>
           </div>
 
-          <div>
+          <div className="mb-12">
             <div className="inline-block px-4 py-2 bg-green-700 dark:bg-gradient-to-r dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 text-white rounded-full mb-4 transition-colors shadow-sm">
               Step 4
             </div>
@@ -128,9 +128,80 @@ const How = () => {
           </div>
         </div>
 
+        {/* New Interview Prep Section */}
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-emerald-500/5 p-8 mb-8 transition-colors">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors mb-4">
+              Be JobFitt - Get Ready for the Interview
+            </h2>
+            <p className="text-lg text-gray-800 dark:text-gray-300 transition-colors">
+              Your application is just the beginning. We prepare you for what
+              comes next.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-green-50 dark:bg-emerald-900/20 p-6 rounded-lg transition-colors text-center">
+              <div className="text-3xl mb-4">🔍</div>
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
+                In-Depth Keyword Analysis
+              </h3>
+              <p className="text-gray-800 dark:text-gray-300 transition-colors">
+                Discover the exact keywords and phrases that matter most for
+                your role. Understand what recruiters and hiring managers are
+                looking for.
+              </p>
+            </div>
+
+            <div className="bg-green-50 dark:bg-emerald-900/20 p-6 rounded-lg transition-colors text-center">
+              <div className="text-3xl mb-4">📊</div>
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
+                Market Insights
+              </h3>
+              <p className="text-gray-800 dark:text-gray-300 transition-colors">
+                Get comprehensive market analysis including salary ranges,
+                industry trends, and competitive landscape for your target role.
+              </p>
+            </div>
+
+            <div className="bg-green-50 dark:bg-emerald-900/20 p-6 rounded-lg transition-colors text-center">
+              <div className="text-3xl mb-4">🏢</div>
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
+                Company Research Insights
+              </h3>
+              <p className="text-gray-800 dark:text-gray-300 transition-colors">
+                Deep dive into company culture, recent news, leadership, values,
+                and strategic initiatives to help you stand out in interviews.
+              </p>
+            </div>
+
+            <div className="bg-green-50 dark:bg-emerald-900/20 p-6 rounded-lg transition-colors text-center">
+              <div className="text-3xl mb-4">❓</div>
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
+                Custom Interview Questions
+              </h3>
+              <p className="text-gray-800 dark:text-gray-300 transition-colors">
+                Practice with role-specific interview questions tailored to the
+                job description and company. Get ready for behavioral and
+                technical questions.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-gradient-to-r from-green-700 to-green-600 dark:from-blue-600 dark:via-purple-600 dark:to-pink-600 p-6 rounded-lg text-center transition-colors">
+            <h3 className="text-xl font-semibold text-white mb-2">
+              Complete Interview Preparation Suite
+            </h3>
+            <p className="text-green-100 dark:text-gray-200">
+              From application to offer - we provide everything you need to
+              succeed in today's competitive job market.
+            </p>
+          </div>
+        </div>
+
         <div className="text-center mt-8">
           <p className="text-2xl font-semibold text-green-800 dark:text-transparent dark:bg-gradient-to-r dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 dark:bg-clip-text transition-colors">
-            From Resume to Interview — We’ve Got You Covered. Tailored resumes,
+            From Resume to Interview — We've Got You Covered. Tailored resumes,
             keyword-matched cover letters, culture insights, and company
             research — all designed to pass ATS filters and land interviews.
           </p>

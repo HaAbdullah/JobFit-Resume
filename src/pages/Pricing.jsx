@@ -2,13 +2,12 @@ import { useState } from "react";
 import { Check, X, Star, Zap, Crown, Infinity } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { useAuth } from "../context/AuthContext";
+
 const PricingPage = () => {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [darkMode, setDarkMode] = useState(true);
   const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
   const { currentUser, signInWithGoogle } = useAuth();
-
-  // Add this enhancement to your handleCheckout function in PricingPage.js
 
   const handleCheckout = async (planName, billingCycle) => {
     try {
@@ -22,21 +21,7 @@ const PricingPage = () => {
       // Store the selected plan in sessionStorage for fallback
       sessionStorage.setItem("selectedPlan", planName);
       sessionStorage.setItem("selectedBillingCycle", billingCycle);
-      // Define your Stripe price IDs - replace with your actual price IDs from Stripe Dashboard
-      // const priceIds = {
-      //   Basic: {
-      //     monthly: "price_1Ra3hoA3sCBSHclDk3KSaLKL",
-      //     yearly: "price_1Ra3jcA3sCBSHclDkdvW5kTr",
-      //   },
-      //   Premium: {
-      //     monthly: "price_1Ra3kSA3sCBSHclDb9rjoG2u",
-      //     yearly: "price_1Ra3knA3sCBSHclDCbKmoiq7",
-      //   },
-      //   "Premium+": {
-      //     monthly: "price_1Ra3l9A3sCBSHclDYBaoP7Gz",
-      //     yearly: "price_1Ra3lPA3sCBSHclDivXblqCh",
-      //   },
-      // };
+
       const priceIds = {
         Basic: {
           monthly: "price_1Ra3pUA3sCBSHclD2iDiFeOK",
@@ -102,36 +87,28 @@ const PricingPage = () => {
         "bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 text-white",
       features: [
         {
-          text: "Ingest Job Description & Resume",
+          text: "Resume & Cover Letter Generation",
           included: true,
           limit: "2 per month",
         },
         {
-          text: "Basic ATS Analysis",
+          text: "Market Analysis",
           included: true,
-          limit: "Simple keyword count",
+          limit: "Based on job description",
         },
-        { text: "Keyword Check (Basic)", included: true, limit: "No heatmap" },
         {
-          text: "Limited Role/Company Research",
+          text: "Keyword Analysis",
           included: true,
-          limit: "General info only",
+          limit: "Job-resume matching",
         },
         {
           text: "Access to Free Content",
           included: true,
           limit: "Guides & tips",
         },
-        {
-          text: "Opportunity Pipeline (Basic)",
-          included: true,
-          limit: "Limited tracking",
-        },
-        { text: "ATS-Optimized Tailoring", included: false },
-        { text: "Full Keyword Heatmap", included: false },
-        { text: "Deep Company Insights", included: false },
-        { text: "Compensation Benchmarking", included: false },
-        { text: "AI Interview Coaching", included: false },
+        { text: "Resume Saving", included: false },
+        { text: "Company Insights", included: false },
+        { text: "Interview Question Bank", included: false },
       ],
     },
     {
@@ -147,35 +124,30 @@ const PricingPage = () => {
       features: [
         { text: "Everything in Freemium", included: true },
         {
-          text: "ATS-Optimized Resume & Cover Letter",
+          text: "Resume & Cover Letter Generation",
           included: true,
           limit: "5 per month",
         },
-        { text: "Full Keyword Heatmap", included: true, limit: "5 roles" },
         {
-          text: "Full Role & Employer Research",
+          text: "Resume Saving",
           included: true,
-          limit: "Detailed insights",
+          limit: "Save and manage your resumes",
         },
         {
-          text: "Role-Specific Question Bank",
+          text: "Company Insights",
           included: true,
-          limit: "Limited access",
+          limit: "Detailed company information",
         },
         {
-          text: "Text-Based Interview Coaching",
+          text: "Interview Question Bank",
           included: true,
-          limit: "Basic guidance",
+          limit: "Role-specific questions",
         },
         {
-          text: "Job Application Limit",
+          text: "Access to Free Content",
           included: true,
-          limit: "5 applications",
+          limit: "Guides & tips",
         },
-        { text: "Deep Company Culture Insights", included: false },
-        { text: "Compensation Benchmarking", included: false },
-        { text: "Interactive AI Interview Coaching", included: false },
-        { text: "Advanced STAR-Method Guidance", included: false },
       ],
     },
     {
@@ -190,43 +162,30 @@ const PricingPage = () => {
       features: [
         { text: "Everything in Basic", included: true },
         {
-          text: "ATS-Optimized Resume & Cover Letter",
+          text: "Resume & Cover Letter Generation",
           included: true,
           limit: "10 per month",
         },
         {
-          text: "Job Application Limit",
+          text: "Resume Saving",
           included: true,
-          limit: "10 applications",
+          limit: "Unlimited storage",
         },
         {
-          text: "Deep Company Culture Insights",
+          text: "Enhanced Company Insights",
           included: true,
-          limit: "Comprehensive scraping",
+          limit: "Deep company analysis",
         },
         {
-          text: "Comprehensive Question Bank",
+          text: "Comprehensive Interview Question Bank",
           included: true,
-          limit: "Full access",
+          limit: "Industry-specific prep",
         },
         {
-          text: "Compensation Benchmarking",
+          text: "Access to Free Content",
           included: true,
-          limit: "Detailed salary ranges",
+          limit: "Guides & tips",
         },
-        {
-          text: "Interactive AI Interview Coaching",
-          included: true,
-          limit: "Full suite",
-        },
-        {
-          text: "Advanced STAR-Method Guidance",
-          included: true,
-          limit: "Interactive prompting",
-        },
-        { text: "Glassdoor & LinkedIn Insights", included: true },
-        { text: "Geography-Based Salary Data", included: true },
-        { text: "Unlimited Access", included: false },
       ],
     },
     {
@@ -246,14 +205,24 @@ const PricingPage = () => {
           limit: "No monthly limits",
         },
         {
-          text: "UNLIMITED Job Applications",
+          text: "UNLIMITED Resume Saving",
           included: true,
-          limit: "Track as many as needed",
+          limit: "Unlimited storage & organization",
         },
         {
-          text: "UNLIMITED Research & Analysis",
+          text: "UNLIMITED Market & Keyword Analysis",
           included: true,
           limit: "All tools unrestricted",
+        },
+        {
+          text: "Priority Company Insights",
+          included: true,
+          limit: "Real-time data updates",
+        },
+        {
+          text: "Premium Interview Question Bank",
+          included: true,
+          limit: "AI-powered personalization",
         },
         {
           text: "Priority Support",
@@ -261,25 +230,14 @@ const PricingPage = () => {
           limit: "Fastest response times",
         },
         {
-          text: "Advanced Analytics Dashboard",
-          included: true,
-          limit: "Detailed insights",
-        },
-        { text: "Custom Integrations", included: true, limit: "API access" },
-        {
-          text: "White-Glove Onboarding",
-          included: true,
-          limit: "Personal setup call",
-        },
-        {
           text: "Beta Feature Access",
           included: true,
           limit: "First to try new features",
         },
         {
-          text: "Export & Backup Tools",
+          text: "Access to Free Content",
           included: true,
-          limit: "Full data portability",
+          limit: "Guides & tips + premium content",
         },
       ],
     },
@@ -301,7 +259,7 @@ const PricingPage = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Choose Your{" "}
               <span className="text-green-700 dark:text-emerald-400">
-                JobFitt.Ai
+                JobFitt.AI
               </span>{" "}
               Plan
             </h1>

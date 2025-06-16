@@ -56,20 +56,22 @@ const Navbar = () => {
             <img
               src="/logo.png"
               alt="JobFitt.Ai Logo"
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
             />
             <span className="text-emerald-400 font-bold text-lg sm:text-xl font-sans">
               JobFitt.Ai
             </span>
           </Link>
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Always show Dashboard button */}
-            <Link
-              to="/dashboard"
-              className="bg-emerald-600 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-opacity-90 text-xs sm:text-sm transition-all duration-300 shadow-sm"
-            >
-              Dashboard
-            </Link>
+            {/* Dashboard button - only show if authenticated */}
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                className="bg-emerald-600 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-opacity-90 text-xs sm:text-sm transition-all duration-300 shadow-sm"
+              >
+                Dashboard
+              </Link>
+            )}
 
             {/* Menu toggle */}
             <button
@@ -137,13 +139,16 @@ const Navbar = () => {
                 {["Home", "How It Works?", "Why JobFitt.Ai?", "Contact Us"][i]}
               </Link>
             ))}
-            <Link
-              to="/dashboard"
-              onClick={handleNavClick}
-              className="block py-2 text-gray-100 hover:text-emerald-400 transition-colors"
-            >
-              Dashboard
-            </Link>
+            {/* Dashboard in mobile menu - only show if authenticated */}
+            {isAuthenticated && (
+              <Link
+                to="/dashboard"
+                onClick={handleNavClick}
+                className="block py-2 text-gray-100 hover:text-emerald-400 transition-colors"
+              >
+                Dashboard
+              </Link>
+            )}
             {!isAuthenticated && (
               <Link
                 to="/login"
@@ -178,7 +183,7 @@ const Navbar = () => {
           src="/logo.png"
           alt="JobFitt.Ai Logo"
           className={`object-contain ${
-            scrolled ? "w-10 h-10 lg:w-11 lg:h-11" : "w-12 h-12"
+            scrolled ? "w-12 h-12 lg:w-13 lg:h-13" : "w-14 h-14"
           }`}
         />
         <span
@@ -223,15 +228,17 @@ const Navbar = () => {
           Pricing
         </Link>
 
-        {/* Dashboard button - always show */}
-        <Link
-          to="/dashboard"
-          className={`bg-emerald-600 text-white font-semibold rounded-full hover:bg-opacity-90 transition-colors shadow-sm whitespace-nowrap ${
-            scrolled ? "px-5 py-2.5 text-sm" : "px-6 py-2.5 text-base"
-          }`}
-        >
-          Dashboard
-        </Link>
+        {/* Dashboard button - only show if authenticated */}
+        {isAuthenticated && (
+          <Link
+            to="/dashboard"
+            className={`bg-emerald-600 text-white font-semibold rounded-full hover:bg-opacity-90 transition-colors shadow-sm whitespace-nowrap ${
+              scrolled ? "px-5 py-2.5 text-sm" : "px-6 py-2.5 text-base"
+            }`}
+          >
+            Dashboard
+          </Link>
+        )}
 
         {isAuthenticated ? (
           <Link to="/account" className="flex-shrink-0">
