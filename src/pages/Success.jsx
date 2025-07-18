@@ -9,7 +9,7 @@ const Success = () => {
   const [loading, setLoading] = useState(true);
   const [tierUpdated, setTierUpdated] = useState(false);
   const { currentUser } = useAuth();
-  const { upgradeTier } = useUsage();
+  const { refreshUserData } = useUsage();
 
   // Debug logging
   useEffect(() => {
@@ -25,41 +25,28 @@ const Success = () => {
       // Get session_id from URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get("session_id");
-      const planFromUrl = urlParams.get("plan");
 
       console.log("Session ID from URL:", sessionId);
-      console.log("Plan from URL:", planFromUrl);
 
       if (sessionId) {
         await verifySession(sessionId);
       } else {
-        console.log("No session ID found, checking for plan info...");
-
-        // Try to get plan info from URL or sessionStorage
-        const planFromStorage = sessionStorage.getItem("selectedPlan");
-        console.log("Plan from storage:", planFromStorage);
-
-        if (planFromUrl || planFromStorage) {
-          console.log("Found plan info, updating tier...");
-          await updateUserTier(planFromUrl || planFromStorage);
-        } else {
-          console.log("No plan information found");
-        }
-
+        console.log("No session ID found");
         setLoading(false);
       }
     };
 
     initializeSuccess();
-  }, []); // Remove currentUser from deps to avoid infinite loops
+  }, []);
 
-  // Separate effect to handle tier updates when user becomes available
+  // Separate effect to refresh user data when user becomes available
   useEffect(() => {
-    if (currentUser && sessionData?.planName && !tierUpdated) {
-      console.log("User available, updating tier with session data...");
-      updateUserTier(sessionData.planName);
+    if (currentUser && sessionData && !tierUpdated) {
+      console.log("User available, refreshing user data from database...");
+      refreshUserDataFromDatabase();
     }
   }, [currentUser, sessionData, tierUpdated]);
+
   const verifySession = async (sessionId) => {
     console.log("Verifying session:", sessionId);
 
@@ -78,18 +65,7 @@ const Success = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Session verification successful:", data);
-        console.log("Full response data:", JSON.stringify(data, null, 2)); // Add this line
-
         setSessionData(data);
-
-        // Remove the immediate storage code - let the useEffect handle it
-        // The useEffect above will handle storage when currentUser is available
-
-        // Update the user's tier
-        if (data.planName && currentUser && !tierUpdated) {
-          console.log("Updating tier immediately with session data...");
-          await updateUserTier(data.planName);
-        }
       } else {
         console.error("Session verification failed:", response.status);
         const errorText = await response.text();
@@ -102,39 +78,13 @@ const Success = () => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    if (currentUser && sessionData) {
-      console.log("User now available, storing subscription data...");
 
-      // Store customer ID if available
-      if (sessionData.customer_id) {
-        localStorage.setItem(
-          `stripe_customer_${currentUser.uid}`,
-          sessionData.customer_id
-        );
-        console.log("✅ Stored customer ID:", sessionData.customer_id);
-      }
-
-      // Store subscription ID if available
-      if (sessionData.subscription_id) {
-        localStorage.setItem(
-          `stripe_subscription_${currentUser.uid}`,
-          sessionData.subscription_id
-        );
-        console.log("✅ Stored subscription ID:", sessionData.subscription_id);
-      } else {
-        console.warn("⚠️ No subscription_id in session data");
-      }
-    }
-  }, [currentUser, sessionData]);
-  // Updated function to update the user's tier
-  const updateUserTier = async (planName) => {
-    console.log("updateUserTier called with:", planName);
-    console.log("Current user:", currentUser);
-    console.log("Tier already updated:", tierUpdated);
+  // Refresh user data from database (this will get the updated tier from the webhook)
+  const refreshUserDataFromDatabase = async () => {
+    console.log("Refreshing user data from database...");
 
     if (!currentUser) {
-      console.log("No current user available, cannot update tier");
+      console.log("No current user available, cannot refresh data");
       return;
     }
 
@@ -143,35 +93,17 @@ const Success = () => {
       return;
     }
 
-    // Map plan names to tier constants
-    const planToTier = {
-      Basic: "BASIC",
-      Premium: "PREMIUM",
-      "Premium+": "PREMIUM_PLUS",
-    };
+    try {
+      // Use the refreshUserData function from UsageContext to get fresh data from database
+      await refreshUserData();
+      setTierUpdated(true);
 
-    const tierKey = planToTier[planName];
-    console.log("Mapped tier key:", tierKey);
+      // Clear any stored plan selection
+      sessionStorage.removeItem("selectedPlan");
 
-    if (tierKey) {
-      try {
-        console.log(`Upgrading user ${currentUser.uid} to ${tierKey} tier`);
-
-        // Call the upgradeTier function
-        await upgradeTier(tierKey);
-
-        setTierUpdated(true);
-
-        // Clear any stored plan selection
-        sessionStorage.removeItem("selectedPlan");
-
-        console.log("Tier updated successfully!");
-      } catch (error) {
-        console.error("Error updating tier:", error);
-      }
-    } else {
-      console.warn("Unknown plan name:", planName);
-      console.log("Available plan mappings:", Object.keys(planToTier));
+      console.log("User data refreshed successfully!");
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
     }
   };
 
@@ -222,31 +154,6 @@ const Success = () => {
               ! Your subscription is now active and you're ready to accelerate
               your job search.
             </p>
-
-            {/* Debug Info (remove in production) */}
-            {/* {process.env.NODE_ENV === "development" && (
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-6 border border-yellow-200 dark:border-yellow-800 text-left">
-                <h4 className="font-bold text-yellow-800 dark:text-yellow-300 mb-2">
-                  Debug Info:
-                </h4>
-                <pre className="text-xs text-yellow-700 dark:text-yellow-400">
-                  {JSON.stringify(
-                    {
-                      currentUser: currentUser
-                        ? { uid: currentUser.uid }
-                        : null,
-                      sessionData,
-                      tierUpdated,
-                      urlParams: Object.fromEntries(
-                        new URLSearchParams(window.location.search)
-                      ),
-                    },
-                    null,
-                    2
-                  )}
-                </pre>
-              </div>
-            )} */}
 
             {/* Tier Update Confirmation */}
             {tierUpdated && (
